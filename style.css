@@ -1,0 +1,14 @@
+body{
+    text-align: center;
+}
+
+hr{
+    width: 50rem;
+}
+
+#grid{
+    width: 30vw;
+    height: 30vw;
+    background-color: red;
+    margin: 0 auto;
+}
