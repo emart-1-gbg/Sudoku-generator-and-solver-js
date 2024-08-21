@@ -1,3 +1,8 @@
+:root{
+    --grid_size: 540px;
+    --tile_size: calc(var(--grid_size)/9 - 2px) /* 58px */
+}
+
 body{
     text-align: center;
 }
@@ -7,8 +12,26 @@ hr{
 }
 
 #grid{
-    width: 30vw;
-    height: 30vw;
-    background-color: red;
+    --grid_size: 540px;
+    width: var(--grid_size);
+    height: var(--grid_size);
     margin: 0 auto;
+    border: 2px solid yellow ;
+    display: flex;
+    flex-wrap: wrap;
+
+}
+
+.tile{
+    width: var(--tile_size);
+    height: var(--tile_size);
+    border: 1px solid lightgray;
+}
+
+.vertical_line{
+    border-right: 1px solid gray;
+}
+
+.horisontal_line{
+    border-bottom: 1px solid gray b;
 }
