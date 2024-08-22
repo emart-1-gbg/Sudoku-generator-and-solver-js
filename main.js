@@ -21,5 +21,12 @@ window.onload = function(){
 
         }
     }
+}
 
+function read_tile(tile) {
+    null
+}
+
+function solve() {
+    null
 }

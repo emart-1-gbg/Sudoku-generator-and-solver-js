@@ -5,6 +5,7 @@
 
 body{
     text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 hr{
@@ -25,6 +26,10 @@ hr{
     width: var(--tile_size);
     height: var(--tile_size);
     border: 1px solid lightgray;
+    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .vertical_line{
