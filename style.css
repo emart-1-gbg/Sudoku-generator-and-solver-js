@@ -1,6 +1,6 @@
 :root{
-    --grid_size: 540px;
-    --tile_size: calc(var(--grid_size)/9 - 2px) /* 58px */
+    --grid_size: 630px; /* Has to be a multiple of 9 */
+    --tile_size: calc(var(--grid_size)/9 - 2px) 
 }
 
 body{
@@ -8,11 +8,10 @@ body{
 }
 
 hr{
-    width: 50rem;
+    width: 60vw;
 }
 
 #grid{
-    --grid_size: 540px;
     width: var(--grid_size);
     height: var(--grid_size);
     margin: 30px auto;
@@ -46,6 +45,7 @@ hr{
 
 button{
     width: 100%;
-    height: 2vw;
+    padding: 10px 0;
     font-size: large;
+    text-wrap:pretty;
 }
