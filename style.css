@@ -1,5 +1,5 @@
 :root{
-    --grid_size: 630px; /* Has to be a multiple of 9 */
+    --grid_size: 60vh; /* Has to be a multiple of 9 */
     --tile_size: calc(var(--grid_size)/9 - 2px) 
 }
 
