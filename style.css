@@ -18,6 +18,7 @@ hr{
     margin: 30px auto;
     border: 1px solid black ;
     display: flex;
+    align-items: flex-start;
     flex-wrap: wrap;
 
 }
@@ -40,17 +41,22 @@ hr{
     border-bottom: 1px solid gray;
 }
 
+.hint{
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
 #button_sect{
     display: flex;
     justify-content: center;
     margin: auto;
-    width: 25vw;
+    width: 50vw;
     gap: 2vw;
 }
 
 button{
     width: 100%;
-    padding: 10px 0;
+    padding: 0.5rem 2rem;
     font-size: large;
     text-wrap:pretty;
 }
+

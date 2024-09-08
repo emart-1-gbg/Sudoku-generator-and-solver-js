@@ -1,13 +1,13 @@
 const grid = document.getElementById("grid")
 
 
-window.onload = function(){
+window.onload = async function(){
     console.log("laod")
 
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
             let tile = document.createElement("div")
-            tile.id = y.toString() + "-" + x.toString()
+            tile.id = give_id(x, y)
             tile.classList.add("tile")
             grid.appendChild(tile)
             
@@ -21,47 +21,104 @@ window.onload = function(){
 
             tile.innerHTML = null
 
+            let block = 1
+
+            if (3 <= y && y < 6){
+                block += 3
+            }
+            else if (6 <= y){
+                block += 6
+            }
+
+            block += Math.floor(x/3)
+            let block_class = "b" + block.toString()
+            tile.classList.add(block_class)
+
         }
+        await delay()
+
     }
-        
-    generate(grid)
+    
+    generate()
 
 }
 
+async function generate(grid) {
+    clear_grid()
+    let a = 0
 
+    // randomise
+    for (let i = 0; i < 30; i++) {
+        await delay(a)
+        let y = rand_num()
+        let x = rand_num()
+        let id = give_id(x, y)
+        
+        let value = rand_num() + 1
+
+        let tile = get_tile(id)
+        if (tile.innerHTML.length === 0) {
+            update_tile(tile, value)
+            a++
+        }
+        else{continue}
+        
+    }
+    console.log("done" + a.toString())
+    
+}
+
+//tile.classList.add("hint")
+
+
+function solve() {
+    null
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function check_valid(id) {
+    let tile = get_tile(id)
+    let [x, y] = give_xy(id)
+
+    let num = tile.innerHTML
+
+}
+
+function clear_grid(grid) {
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) { 
+            let id = give_id(x, y)
+            let tile = document.getElementById(id)
+            update_tile(tile, null)
+            tile.classList.remove("hint")
+        }
+    }
+}
 
 function rand_num() {
             return Math.floor(Math.random() * 9)
-        }
-
-function generate(grid) {
-
-    for (let i = 0; i < 20; i++) {
-        let y = rand_num()
-        let x = rand_num()
-        let current_tile = y.toString() + "-" + x.toString()
-        
-        let n = Math.floor(Math.random() * 9) + 1
-        document.getElementById(current_tile).innerHTML = n
-    }
-
-    alert(current_tile)
-
-
-    console.log(x, y)
 }
-
-
-
 
 function read_tile(tile) {
     return tile.innerHTML
 }
 
-function update_tile(tile) {
-    null
+function update_tile(tile, val) {
+    tile.innerHTML = val
 }
 
-function solve() {
-    null
+function get_tile(id) {
+    return document.getElementById(id)
+}
+
+function give_id(x, y) {
+    return x.toString() + '-' + y.toString()
+}
+
+function give_xy(id) {
+    let sep = id.split("-")
+    return [sep[0], sep[1]]
 }
