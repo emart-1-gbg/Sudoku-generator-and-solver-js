@@ -34,22 +34,37 @@ window.onload = async function(){
             let block_class = "b" + block.toString()
             tile.classList.add(block_class)
 
-            let text_container = document.createElement("div")
-            text_container.classList.add("text_container", "candidates")
-            tile.appendChild(text_container)
-            
-            update_tile(tile, "123456789")
         }
+        await delay()
+
     }
     
     generate()
 
 }
 
-async function generate() {
-    let x = rand_num()
-    let y = rand_num()
+async function generate(grid) {
+    clear_grid()
+    let a = 0
 
+    // randomise
+    for (let i = 0; i < 30; i++) {
+        await delay(a)
+        let y = rand_num()
+        let x = rand_num()
+        let id = give_id(x, y)
+        
+        let value = rand_num() + 1
+
+        let tile = get_tile(id)
+        if (tile.innerHTML.length === 0) {
+            update_tile(tile, value)
+            a++
+        }
+        else{continue}
+        
+    }
+    console.log("done" + a.toString())
     
 }
 
@@ -84,15 +99,15 @@ function clear_grid(grid) {
 }
 
 function rand_num() {
-    return Math.floor(Math.random() * 9)
+            return Math.floor(Math.random() * 9)
 }
 
 function read_tile(tile) {
-    return tile.children[0].innerHTML
+    return tile.innerHTML
 }
 
 function update_tile(tile, val) {
-    tile.children[0].innerHTML = val
+    tile.innerHTML = val
 }
 
 function get_tile(id) {
