@@ -88,22 +88,19 @@ function check_valid(id) {
 }
 
 function set_grid(file) {
-    const puzzle = file.target.files[0]
-    const reader = new FileReader()
-
-    reader.onload = (event) => {
-        const puzzle = event.target.result;
-        const allLines = puzzle.split(/\r\n|\n/);
-        // Reading line by line
-        allLines.forEach((line) => {
-            console.log(line);
-        });
-    };
-
+    file = "test_puzzles/medium1.txt"
+    fetch(file)
+    .then((res) => res.text())
+    .then((text) => {
+        let rows = text.split("\n")
+        console.log(rows[0]);
+        
+    })
+    .catch((e) => console.error(e));
 
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) { 
-            
+           null 
         }
     }
 }
