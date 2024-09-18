@@ -34,8 +34,12 @@ window.onload = async function(){
             let block_class = "b" + block.toString()
             tile.classList.add(block_class)
 
+
+            let text_container = document.createElement("div")
+            text_container.classList.add("text_container")
+            tile.appendChild(text_container)
+            
         }
-        await delay()
 
     }
     
@@ -87,20 +91,35 @@ function check_valid(id) {
 
 }
 
-function set_grid(file) {
-    file = "test_puzzles/medium1.txt"
-    read_file_row(file, 0)
+// Make set_grid async to handle asynchronous code
+async function set_grid(file) {
+    file = "test_puzzles/medium1.txt";
+    let current_row;
+    
+    for (let y = 0; y < 9; y++) {
+        // Await the result of read_file_row
+        current_row = await read_file_row(file, y);
 
+        for (let x = 0; x < 9; x++) {
+            let tile = get_tile(give_id(x, y));
+            if (current_row[x] != 0) {
+                update_tile(tile, current_row[x])
+            }
+        }   
+    }
 }
 
-function read_file_row(file, row) {
-    fetch(file)
-    .then((res) => res.text())
-    .then((text) => {
-        let lines = text.split("\n")
-        return lines[row]
-    })
-    .catch((e) => console.error(e));
+// Make read_file_row async and return a Promise
+async function read_file_row(file, row) {
+    try {
+        const res = await fetch(file); // Await the fetch operation
+        const text = await res.text(); // Await the text conversion
+        const lines = text.split("\n"); // Split text by lines
+        return lines[row]; // Return the specific row
+        
+    } catch (e) {
+        console.error(e); // Handle any errors
+    }
 }
 
 function rand_num() {
@@ -112,7 +131,7 @@ function read_tile(tile) {
 }
 
 function update_tile(tile, val) {
-    tile.innerHTML = val
+    tile.children[0].innerHTML = val
 }
 
 function get_tile(id) {
