@@ -112,8 +112,8 @@ async function set_grid(file) {
 // Make read_file_row async and return a Promise
 async function read_file_row(file, row) {
     try {
-        const res = await fetch(file); // Await the fetch operation
-        const text = await res.text(); // Await the text conversion
+        const raw = await fetch(file); // Await the fetch operation
+        const text = await raw.text(); // Await the text conversion
         const lines = text.split("\n"); // Split text by lines
         return lines[row]; // Return the specific row
         
@@ -123,7 +123,7 @@ async function read_file_row(file, row) {
 }
 
 function rand_num() {
-            return Math.floor(Math.random() * 9)
+    return Math.floor(Math.random() * 9)
 }
 
 function read_tile(tile) {
