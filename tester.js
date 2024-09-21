@@ -47,40 +47,43 @@ window.onload = async function(){
 
 }
 
-async function generate(grid) {
-    clear_grid()
-    let a = 0
-
-    // randomise
-    for (let i = 0; i < 30; i++) {
-        await delay(a)
-        let y = rand_num()
-        let x = rand_num()
-        let id = give_id(x, y)
-        
-        let value = rand_num() + 1
-
-        let tile = get_tile(id)
-        if (tile.innerHTML.length === 0) {
-            update_tile(tile, value)
-            a++
-        }
-        else{continue}
-        
-    }
-    console.log("done" + a.toString())
-    
-}
-
-//tile.classList.add("hint")
-
 
 function solve() {
-    null
-}
+    let x = 0
+    let y = 0
+    let id = give_id(x, y)
+    let current_row = get_row_num(id)
+    
 
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    console.log("raw row: ", current_row);
+    
+    for (let i = 0; i < 9; i++) {
+        let current_id = give_id(i, y)
+        let current_col = get_col_num(current_id)
+        console.log("raw col: ", current_col);
+
+        let current_tile = get_tile(give_id(i, y))
+        let is_hint = current_tile.classList.contains("hint")
+        let is_full = read_tile(current_tile) !== ""
+
+        if (!is_hint || !is_full) {
+
+            for (let n = 1; n < 10; n++) {
+                let val = n.toString()
+                
+                if (!current_row.includes(val) &&
+                    !current_col.includes(val)) {     
+                    console.log(current_col.includes(val), n);
+                    
+                    update_tile(current_tile, val)
+                    current_row.push(val)
+                    console.log("updated row: ", current_row);
+                    break
+                    
+                }   
+            }
+        }
+    }
 }
 
 function check_valid(id) {
@@ -89,6 +92,28 @@ function check_valid(id) {
 
     let num = tile.innerHTML
 
+}
+
+function get_row_num(id){
+    let [x, y] = give_xy(id)
+    let row = []
+
+    for (let i = 0; i < 9; i++) {
+        let current_id = give_id(i, y)
+        let num = read_tile(get_tile(current_id))
+        if (num) {row.push(num)}
+    } return row
+}
+
+function get_col_num(id){
+    let [x, y] = give_xy(id)
+    let col = []
+
+    for (let i = 0; i < 9; i++) {
+        let current_id = give_id(x, i)
+        let num = read_tile(get_tile(current_id))
+        if (num) {col.push(num)}
+    } return col
 }
 
 // Make set_grid async to handle asynchronous code
@@ -103,6 +128,7 @@ async function set_grid(file) {
         for (let x = 0; x < 9; x++) {
             let tile = get_tile(give_id(x, y));
             if (current_row[x] != 0) {
+                tile.classList.add("hint")
                 update_tile(tile, current_row[x])
             }
         }   
@@ -126,8 +152,8 @@ function rand_num() {
     return Math.floor(Math.random() * 9)
 }
 
-function read_tile(tile) {
-    return tile.innerHTML
+function read_tile(tile) {    
+    return tile.children[0].innerHTML
 }
 
 function update_tile(tile, val) {
@@ -142,7 +168,11 @@ function give_id(x, y) {
     return x.toString() + '-' + y.toString()
 }
 
-function give_xy(id) {
+function give_xy(id) { // usage: let [x, y] = give_xy(id)
     let sep = id.split("-")
     return [sep[0], sep[1]]
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

@@ -47,10 +47,27 @@ window.onload = async function(){
 }
 
 async function generate() {
-    let x = rand_num()
-    let y = rand_num()
-
+    function generate(grid) {
+        clear_grid()
+        let a = 0
     
+        // randomise
+        for (let i = 0; i < 30; i++) {
+            let y = rand_num()
+            let x = rand_num()
+            let id = give_id(x, y)
+            
+            let value = rand_num() + 1
+    
+            let tile = get_tile(id)
+            if (tile.innerHTML.length === 0) {
+                update_tile(tile, value)
+                a++
+            }
+            else{continue}
+            
+        }
+    }
 }
 
 //tile.classList.add("hint")
