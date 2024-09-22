@@ -21,17 +21,7 @@ window.onload = async function(){
 
             tile.innerHTML = null
 
-            let block = 1
-
-            if (3 <= y && y < 6){
-                block += 3
-            }
-            else if (6 <= y){
-                block += 6
-            }
-
-            block += Math.floor(x/3)
-            let block_class = "b" + block.toString()
+            let block_class = "b" + get_box(give_id(x, y)).toString()
             tile.classList.add(block_class)
 
 
@@ -54,7 +44,6 @@ function solve() {
     let id = give_id(x, y)
     let current_row = get_row_num(id)
     
-
     console.log("raw row: ", current_row);
     
     for (let i = 0; i < 9; i++) {
@@ -116,6 +105,35 @@ function get_col_num(id){
     } return col
 }
 
+function get_box_num(id) {
+    let box = []
+    let box_n = "b" + get_box(id).toString()
+    
+    for (let i = 0; i < 9; i++) {
+        let tile = document.getElementsByClassName(box_n)[i]
+        let val = read_tile(tile)
+        if (val !== "") {            
+            box.push(val)
+        }
+    }
+    return box
+}
+
+function get_box(id) {
+    let [x, y] = give_xy(id)
+    let block = 1
+
+    if (3 <= y && y < 6){
+        block += 3
+    }
+    else if (6 <= y){
+        block += 6
+    }
+
+    block += Math.floor(x/3)
+    return block
+}
+
 // Make set_grid async to handle asynchronous code
 async function set_grid(file) {
     file = "test_puzzles/medium1.txt";
@@ -152,7 +170,8 @@ function rand_num() {
     return Math.floor(Math.random() * 9)
 }
 
-function read_tile(tile) {    
+function read_tile(tile) { 
+    // console.log("reading: ", tile);
     return tile.children[0].innerHTML
 }
 
