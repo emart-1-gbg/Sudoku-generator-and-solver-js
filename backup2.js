@@ -34,53 +34,40 @@ window.onload = async function () {
 }
 
 
-function solve(x = 0, y = 0) {
-    console.log("solving");
-    let id = give_id(x, y)
+function solve() {
 
-    /*
-    console.log("raw row: ", current_row);
-    console.log("raw col: ", current_col);
-    console.log("raw box: ", current_box);
-    */
-    let current_tile = get_tile(id)
-    let is_hint = current_tile.classList.contains("hint")
-    let is_full = read_tile(current_tile) !== ""
-    console.log(!is_hint, !is_full);
-    while (is_hint || is_full) {
-        x++
-        if (x == 8) {
-            x = 0
-            y++
-        }
-        console.log(x);
-        
-        id = give_id(x, y)
-        current_tile = get_tile(id)
-        is_hint = current_tile.classList.contains("hint")
-        is_full = read_tile(current_tile) !== ""
-    }
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) {
+            let current_id = give_id(x, y)
+            let current_row = get_row_num(current_id)
 
 
-    console.log(id, "is empty");
+            /*
+            console.log("raw row: ", current_row);
+            console.log("raw col: ", current_col);
+            console.log("raw box: ", current_box);
+            */
+            let current_tile = get_tile(current_id)
+            let is_hint = current_tile.classList.contains("hint")
+            let is_full = read_tile(current_tile) !== ""
 
-    for (let n = 1; n < 10; n++) {
-        let val = n.toString()
-        update_tile(current_tile, val)
+            if (!is_hint || !is_full) {
 
-        if (check_valid_placement(id, val)) {
-            console.log("is valid");
-            
-            if (solve(x + 1, y)) {
-                return true
+                for (let n = 1; n < 10; n++) {
+                    let val = n.toString()
+
+                    if (check_valid_placement(current_id, val)) {
+
+                        update_tile(current_tile, val)
+                        current_row.push(val)
+                        console.log("updated row: ", current_row);
+                        break
+
+                    }
+                }
             }
         }
     }
-    if (!is_hint || !is_full) {
-        update_tile(current_tile, "")
-        return false
-    }
-
 }
 
 
@@ -90,21 +77,11 @@ function check_valid_placement(id, n) {
     let current_col = get_col_num(id)
     let current_box = get_box_num(id)
 
-    console.log("row", current_row);
-    console.log("col", current_col);
-    console.log("box", current_box);
-    
-
     if (!current_row.includes(n) &&
         !current_col.includes(n) &&
-        !current_box.includes(n)) 
-    {         
-        return true 
-    }
+        !current_box.includes(n)) { return true }
 
-    else { 
-        return false 
-    }
+    else { return false }
 }
 
 // get values in the same row
@@ -180,7 +157,6 @@ async function set_grid(file) {
             }
         }
     }
-    console.clear()
 }
 
 // reads the puzzle file one line at a time
@@ -207,12 +183,10 @@ function read_tile(tile) {
 
 // changes value in tile
 function update_tile(tile, val) {
-    console.log("updating ", tile.id, " to ", val);
-    
     tile.children[0].innerHTML = val
 }
 
-// returns tile DOM from id
+// returns the id of tile
 function get_tile(id) {
     return document.getElementById(id)
 }

@@ -1,5 +1,5 @@
 :root{
-    --grid_size: 65vh; 
+    --grid_size: 60vh; 
     --tile_size: calc(var(--grid_size)/9 - 2px) 
 }
 
@@ -43,7 +43,6 @@ hr{
 
 .hint{
     background-color: rgba(0, 0, 0, 0.082);
-    font-size: 3vw !important;
 }
 
 #button_sect{
@@ -63,7 +62,7 @@ button{
 
 .text_container{
     margin: 10%;
-    font-size: inherit;
+    font-size: 3vh;
     letter-spacing: 4px;
     text-align: center;
     vertical-align: middle;
