@@ -1,6 +1,7 @@
 const delayOutput = document.querySelector("#delay-output");
 const delaySlider = document.querySelector("#delay-slider");
-let timer
+let timer = 0
+delaySlider.value = timer
 
 delayOutput.textContent = delaySlider.value * 10
 delaySlider.addEventListener("input", (event) => {
@@ -79,9 +80,7 @@ async function solve(x = 0, y = 0) {
             update_tile(current_tile, val)
 
             if (await solve(x + 1, y)) {
-                console.log("return true");
                 return true
-
             }
             update_tile(current_tile, "")
             console.log("backtrack");
