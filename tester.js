@@ -29,78 +29,59 @@ window.onload = async function () {
             tile.appendChild(text_container)
         }
     }
-
-    set_grid()
 }
 
+function generate() {
+    solve(rand_num(), rand_num())
+    update_tile(get_tile("0-3"), "")
+}
 
 function solve(x = 0, y = 0) {
     console.log("solving");
-    let id = give_id(x, y)
 
-    /*
-    console.log("raw row: ", current_row);
-    console.log("raw col: ", current_col);
-    console.log("raw box: ", current_box);
-    */
-    let current_tile = get_tile(id)
-    let is_hint = current_tile.classList.contains("hint")
-    let is_full = read_tile(current_tile) !== ""
-    console.log(!is_hint, !is_full);
-
-    if (x == 8) {
-        x = 0
-        y++
+    if (x == 9) {
+        return solve(0, y + 1)
     }
-    console.log(x);
+
+    if (y == 9) {
+        y = 0
+    }
+
+    let id = give_id(x, y)
+    let current_tile = get_tile(id)
+    let is_full = read_tile(current_tile) !== ""
+
+    if (is_full) {
+        return solve(x + 1, y)
+    }
 
     for (let n = 1; n < 10; n++) {
-        let val = n.toString()
-        if (!is_hint || !is_full) {
 
+        let val = n.toString()
+
+        if (check_valid_placement(id, val)) {
             update_tile(current_tile, val)
 
-            if (check_valid_placement(id, val)) {
-                console.log("is valid");
+            if (solve(x + 1, y)) {
+                console.log("return true");
+                return true
 
-                if (solve(x + 1, y)) {
-                    console.log("return true");
-                    
-                    return true
-                }
             }
+            update_tile(current_tile, "")
+            console.log("backtrack");
         }
-        
     }
-
-    update_tile(current_tile, "")
     return false
-
-
 }
 
 function check_valid_placement(id, n) {
-
-
-
     let current_row = get_row_num(id)
     let current_col = get_col_num(id)
     let current_box = get_box_num(id)
 
-    console.log("row", current_row);
-    console.log("col", current_col);
-    console.log("box", current_box);
-
-
-    if (!current_row.includes(n) &&
+    return !current_row.includes(n) &&
         !current_col.includes(n) &&
-        !current_box.includes(n)) {
-        return true
-    }
-
-    else {
-        return false
-    }
+        !current_box.includes(n)
 }
 
 // get values in the same row

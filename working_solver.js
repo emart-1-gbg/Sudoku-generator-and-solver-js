@@ -29,59 +29,56 @@ window.onload = async function () {
             tile.appendChild(text_container)
         }
     }
-
     set_grid()
 }
 
 
-function solve() {
+function solve(x = 0, y = 0) {
+    console.log("solving");
 
-    for (let y = 0; y < 9; y++) {
-        for (let x = 0; x < 9; x++) {
-            let current_id = give_id(x, y)
-            let current_row = get_row_num(current_id)
+    if (x == 9) {
+        return solve(0, y + 1)
+    }
 
+    if (y == 9) {
+        return true
+    }
 
-            /*
-            console.log("raw row: ", current_row);
-            console.log("raw col: ", current_col);
-            console.log("raw box: ", current_box);
-            */
-            let current_tile = get_tile(current_id)
-            let is_hint = current_tile.classList.contains("hint")
-            let is_full = read_tile(current_tile) !== ""
+    let id = give_id(x, y)
+    let current_tile = get_tile(id)
+    let is_full = read_tile(current_tile) !== ""
 
-            if (!is_hint || !is_full) {
+    if (is_full) {
+        return solve(x + 1, y)
+    }
 
-                for (let n = 1; n < 10; n++) {
-                    let val = n.toString()
+    for (let n = 1; n < 10; n++) {
 
-                    if (check_valid_placement(current_id, val)) {
+        let val = n.toString()
 
-                        update_tile(current_tile, val)
-                        current_row.push(val)
-                        console.log("updated row: ", current_row);
-                        break
+        if (check_valid_placement(id, val)) {
+            update_tile(current_tile, val)
 
-                    }
-                }
+            if (solve(x + 1, y)) {
+                console.log("return true");
+                return true
+
             }
+            update_tile(current_tile, "")
+            console.log("backtrack");
         }
     }
+    return false
 }
 
-
 function check_valid_placement(id, n) {
-
     let current_row = get_row_num(id)
     let current_col = get_col_num(id)
     let current_box = get_box_num(id)
 
-    if (!current_row.includes(n) &&
+    return !current_row.includes(n) &&
         !current_col.includes(n) &&
-        !current_box.includes(n)) { return true }
-
-    else { return false }
+        !current_box.includes(n)
 }
 
 // get values in the same row
@@ -157,6 +154,7 @@ async function set_grid(file) {
             }
         }
     }
+    console.clear()
 }
 
 // reads the puzzle file one line at a time
@@ -183,10 +181,12 @@ function read_tile(tile) {
 
 // changes value in tile
 function update_tile(tile, val) {
+    console.log("updating ", tile.id, " to ", val);
+
     tile.children[0].innerHTML = val
 }
 
-// returns the id of tile
+// returns tile DOM from id
 function get_tile(id) {
     return document.getElementById(id)
 }
