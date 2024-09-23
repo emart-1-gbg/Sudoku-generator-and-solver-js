@@ -47,44 +47,41 @@ function solve(x = 0, y = 0) {
     let is_hint = current_tile.classList.contains("hint")
     let is_full = read_tile(current_tile) !== ""
     console.log(!is_hint, !is_full);
-    while (is_hint || is_full) {
-        x++
-        if (x == 8) {
-            x = 0
-            y++
-        }
-        console.log(x);
-        
-        id = give_id(x, y)
-        current_tile = get_tile(id)
-        is_hint = current_tile.classList.contains("hint")
-        is_full = read_tile(current_tile) !== ""
+
+    if (x == 8) {
+        x = 0
+        y++
     }
-
-
-    console.log(id, "is empty");
+    console.log(x);
 
     for (let n = 1; n < 10; n++) {
         let val = n.toString()
-        update_tile(current_tile, val)
+        if (!is_hint || !is_full) {
 
-        if (check_valid_placement(id, val)) {
-            console.log("is valid");
-            
-            if (solve(x + 1, y)) {
-                return true
+            update_tile(current_tile, val)
+
+            if (check_valid_placement(id, val)) {
+                console.log("is valid");
+
+                if (solve(x + 1, y)) {
+                    console.log("return true");
+                    
+                    return true
+                }
             }
         }
+        
     }
-    if (!is_hint || !is_full) {
-        update_tile(current_tile, "")
-        return false
-    }
+
+    update_tile(current_tile, "")
+    return false
+
 
 }
 
-
 function check_valid_placement(id, n) {
+
+
 
     let current_row = get_row_num(id)
     let current_col = get_col_num(id)
@@ -93,17 +90,16 @@ function check_valid_placement(id, n) {
     console.log("row", current_row);
     console.log("col", current_col);
     console.log("box", current_box);
-    
+
 
     if (!current_row.includes(n) &&
         !current_col.includes(n) &&
-        !current_box.includes(n)) 
-    {         
-        return true 
+        !current_box.includes(n)) {
+        return true
     }
 
-    else { 
-        return false 
+    else {
+        return false
     }
 }
 
@@ -208,7 +204,7 @@ function read_tile(tile) {
 // changes value in tile
 function update_tile(tile, val) {
     console.log("updating ", tile.id, " to ", val);
-    
+
     tile.children[0].innerHTML = val
 }
 
