@@ -36,23 +36,28 @@ function generate() {
     update_tile(get_tile("0-3"), "")
 }
 
-function solve(x = 0, y = 0) {
+async function solve(x = 0, y = 0) {
     console.log("solving");
 
+    
     if (x == 9) {
-        return solve(0, y + 1)
+        return await solve(0, y + 1)
     }
-
+    
     if (y == 9) {
-        y = 0
+        if (check_full()) {
+            return true
+        }
     }
+    
+    await delay(10)
 
     let id = give_id(x, y)
     let current_tile = get_tile(id)
     let is_full = read_tile(current_tile) !== ""
 
     if (is_full) {
-        return solve(x + 1, y)
+        return await solve(x + 1, y)
     }
 
     for (let n = 1; n < 10; n++) {
@@ -62,13 +67,14 @@ function solve(x = 0, y = 0) {
         if (check_valid_placement(id, val)) {
             update_tile(current_tile, val)
 
-            if (solve(x + 1, y)) {
+            if (await solve(x + 1, y)) {
                 console.log("return true");
                 return true
 
             }
             update_tile(current_tile, "")
             console.log("backtrack");
+            await delay(40)
         }
     }
     return false
@@ -82,6 +88,20 @@ function check_valid_placement(id, n) {
     return !current_row.includes(n) &&
         !current_col.includes(n) &&
         !current_box.includes(n)
+}
+
+function check_full() {
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) {
+            let id = give_id(x, y)
+            let tile = get_tile(id)
+            if (read_tile(tile) == "") {
+                return false
+            }
+        }
+    }
+    console.log("Puzzle complete");
+    return true
 }
 
 // get values in the same row
@@ -141,7 +161,7 @@ function get_box(id) {
 
 // for testing, read file and fill grid
 async function set_grid(file) {
-    file = "test_puzzles/medium1.txt";
+    file = "test_puzzles/hard.txt";
     let current_row;
 
     for (let y = 0; y < 9; y++) {
