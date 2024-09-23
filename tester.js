@@ -77,12 +77,12 @@ async function solve(x = 0, y = 0) {
         let val = n.toString()
 
         if (check_valid_placement(id, val)) {
-            update_tile(current_tile, val)
+            await update_tile(current_tile, val)
 
             if (await solve(x + 1, y)) {
                 return true
             }
-            update_tile(current_tile, "")
+            await update_tile(current_tile, "")
             console.log("backtrack");
             if (timer != 0) {
                 await delay(timer)
@@ -173,7 +173,7 @@ function get_box(id) {
 
 // for testing, read file and fill grid
 async function set_grid(file) {
-    file = "test_puzzles/hard.txt";
+    file = "test_puzzles/hardest.txt";
     let current_row;
 
     for (let y = 0; y < 9; y++) {
@@ -215,7 +215,7 @@ function read_tile(tile) {
 }
 
 // changes value in tile
-function update_tile(tile, val) {
+async function update_tile(tile, val) {
     console.log("updating ", tile.id, " to ", val);
 
     tile.children[0].innerHTML = val
