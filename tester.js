@@ -1,13 +1,12 @@
-let output = document.querySelector("#value")
-let delay_time = document.querySelector("#delay-time")
-value.textContent = delay_time.value
-delay_time.addEventListener("input", (event) => {
-    value.textContent = event.target.value
-})
+const delayOutput = document.querySelector("#delay-output");
+const delaySlider = document.querySelector("#delay-slider");
+let timer
 
-let timer = delay_time * 10
-console.log(output.value);
-
+delayOutput.textContent = delaySlider.value * 10
+delaySlider.addEventListener("input", (event) => {
+    delayOutput.textContent = event.target.value * 10; // Multiply by 10 for ms display
+    timer = delaySlider.value * 10
+});
 
 const grid = document.getElementById("grid")
 
@@ -61,8 +60,9 @@ async function solve(x = 0, y = 0) {
         }
     }
 
-    await delay(timer)
-
+    if (timer != 0) {
+        await delay(timer)
+    }
     let id = give_id(x, y)
     let current_tile = get_tile(id)
     let is_full = read_tile(current_tile) !== ""
@@ -85,7 +85,9 @@ async function solve(x = 0, y = 0) {
             }
             update_tile(current_tile, "")
             console.log("backtrack");
-            await delay(timer)
+            if (timer != 0) {
+                await delay(timer)
+            }
         }
     }
     return false
