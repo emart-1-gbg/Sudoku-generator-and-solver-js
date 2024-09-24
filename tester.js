@@ -10,6 +10,7 @@ delaySlider.addEventListener("input", (event) => {
 });
 
 const grid = document.getElementById("grid")
+const test_file = "test_puzzles/hard.txt"
 
 // set the tiles and design
 window.onload = async function () {
@@ -31,7 +32,7 @@ window.onload = async function () {
             }
 
             // give the tile a class representing the box 
-            let block_class = "b" + get_box(give_id(x, y)).toString()
+            let block_class = "b" + get_n_box(give_id(x, y)).toString()
             tile.classList.add(block_class)
 
             // create text container inside tile, for better visuals
@@ -42,21 +43,104 @@ window.onload = async function () {
     }
 }
 
-function generate() {
-    solve(rand_num(), rand_num())
-    update_tile(get_tile("0-3"), "")
+/*
+fill with all candidates        done
+pick random tile and set n      done
+remove n from region            --
+pick between x, y               --
+pick random tile in same x/y    --
+set n+1 to next tile            --
+backtrack if invalid            --
+repeat                          --
+profit???
+*/
+
+function generate(x = rand_num(), y = rand_num(), n = 1) {
+    fill_candidates()
+
+    let id = give_id(x, y)
+    let tile = get_tile(id)
+    set_candidate(id, n)
+
+
 }
 
+function check_available(id, n) {
+    null
+}
+
+function set_candidate(id, n) {
+    let tile = get_tile(id)
+    tile.classList.remove("candidates")
+    update_tile(tile, n)
+    eliminate_candidates(id, n)
+}
+
+function eliminate_candidates(id, n) {
+    let [x, y] = give_xy(id)
+
+    for (let i = 0; i < 9; i++) {
+
+
+    }
+}
+
+function testa() {
+    for (let i = 0; i < 9; i++) {
+        remove_candidate("0-0", i)
+
+    }
+}
+
+function remove_candidate(id, n) {
+    let tile = get_tile(id)
+    if (!tile.classList.contains("set")) {
+        let nums = read_tile(tile)
+
+        let new_nums = nums.replace(n, "")
+        update_tile(get_tile(id), new_nums)
+        if (new_nums.length == 1) {
+            tile.classList.replace("candidates", "set")
+        }
+        return true
+    }
+    return false
+}
+
+function get_box_id(id) {
+    let class_name = "b" + get_n_box(id).toString()
+    let ids = []
+    console.log(class_name);
+
+    let elements = document.getElementsByClassName(class_name)
+
+    ids = [...elements].map(element => element.id)
+    console.log(ids);
+
+}
+
+function fill_candidates() {
+    clear_grid()
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) {
+            let tile = get_tile(give_id(x, y))
+            update_tile(tile, "123456789")
+            tile.classList.add("candidates")
+        }
+    }
+    console.clear()
+}
+
+// solving ------------
 async function solve(x = 0, y = 0) {
     console.log("solving");
-
 
     if (x == 9) {
         return await solve(0, y + 1)
     }
 
     if (y == 9) {
-        if (check_full()) {
+        if (check_solved()) {
             return true
         }
     }
@@ -64,6 +148,7 @@ async function solve(x = 0, y = 0) {
     if (timer != 0) {
         await delay(timer)
     }
+
     let id = give_id(x, y)
     let current_tile = get_tile(id)
     let is_full = read_tile(current_tile) !== ""
@@ -102,7 +187,7 @@ function check_valid_placement(id, n) {
         !current_box.includes(n)
 }
 
-function check_full() {
+function check_solved() {
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
             let id = give_id(x, y)
@@ -143,7 +228,7 @@ function get_col_num(id) {
 // get values in the same box
 function get_box_num(id) {
     let box = []
-    let box_n = "b" + get_box(id).toString()
+    let box_n = "b" + get_n_box(id).toString()
 
     for (let i = 0; i < 9; i++) {
         let tile = document.getElementsByClassName(box_n)[i]
@@ -156,7 +241,7 @@ function get_box_num(id) {
 }
 
 // get the box number of tile
-function get_box(id) {
+function get_n_box(id) {
     let [x, y] = give_xy(id)
     let block = 1
 
@@ -173,8 +258,9 @@ function get_box(id) {
 
 // for testing, read file and fill grid
 async function set_grid(file) {
-    file = "test_puzzles/hardest.txt";
-    let current_row;
+    clear_grid()
+    file = test_file
+    let current_row
 
     for (let y = 0; y < 9; y++) {
         // wait for the row to be read from file
@@ -203,6 +289,7 @@ async function read_file_row(file, row) {
     } catch (e) { console.error(e) }
 }
 
+// general functions -----------
 // generate random number 0-8
 function rand_num() {
     return Math.floor(Math.random() * 9)
@@ -240,4 +327,15 @@ function give_xy(id) { // usage: let [x, y] = give_xy(id)
 // delays operations, for visualisation
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function clear_grid() {
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) {
+            let id = give_id(x, y)
+            let tile = document.getElementById(id)
+            update_tile(tile, "")
+            tile.classList.remove("hint", "candidates")
+        }
+    }
 }

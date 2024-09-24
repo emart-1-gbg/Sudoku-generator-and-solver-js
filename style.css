@@ -1,6 +1,8 @@
 :root{
     --grid_size: 60vh; 
-    --tile_size: calc(var(--grid_size)/9 - 2px) 
+    --tile_size: calc(var(--grid_size)/9 - 2px);
+    --c1: rgba(0, 0, 0, 0.082);
+
 }
 
 body{
@@ -41,10 +43,6 @@ hr{
     border-bottom: 1px solid gray;
 }
 
-.hint{
-    background-color: rgba(0, 0, 0, 0.082);
-}
-
 #button_sect{
     display: flex;
     flex-direction: column;
@@ -78,10 +76,23 @@ button{
 
 .text_container{
     margin: 10%;
-    font-size: 3vh;
+    font-size: inherit;
     letter-spacing: 4px;
     text-align: center;
     vertical-align: middle;
     overflow-wrap: break-word;
     word-break: break-all;
+}
+
+.candidates{
+    color: rgba(0, 0, 0, 0.436);
+    font-size: 1.5vh !important;
+}
+
+.hint{
+    background-color: rgba(9, 9, 9, 0.037) !important; 
+}
+
+.set{
+    background-color: rgba(0, 128, 0, 0.106);
 }
