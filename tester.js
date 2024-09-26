@@ -46,12 +46,12 @@ window.onload = async function () {
 /*
 fill with all candidates        done
 pick random tile and set n      done
-remove n from region            --
-pick between x, y               --
+remove n from region            done
+pick between x, y               done
 pick random tile in same x/y    --
 set n+1 to next tile            --
 backtrack if invalid            --
-repeat                          --
+recurse                         --
 profit???
 */
 
@@ -59,9 +59,27 @@ function generate(x = rand_num(), y = rand_num(), n = 1) {
     fill_candidates()
 
     let id = give_id(x, y)
-    let tile = get_tile(id)
     set_candidate(id, n)
 
+    let next_ids = []
+
+
+    if (Math.floor(Math.random() * 2) == 0) {
+        for (let i = 0; i < 9; i++) {
+            next_ids.push(give_id(i, y))
+        }
+    } else {
+        for (let i = 0; i < 9; i++) {
+            next_ids.push(give_id(x, i))
+        }
+    }
+    
+    next_ids.pop(next_ids.indexOf(id))
+    console.log("next", next_ids);
+
+    let next = next_ids[Math.floor(Math.random()*next_ids.length)]
+    let [next_x, next_y] = give_xy(next)
+    generate(next_x, next_y, n++)
 
 }
 
@@ -77,10 +95,13 @@ function set_candidate(id, n) {
 }
 
 function eliminate_candidates(id, n) {
-    let [x, y] = give_xy(id)
-
-    for (let i = 0; i < 9; i++) {
-
+    let region = [...get_row_id(id), ...get_col_id(id), ...get_box_id(id)]
+    console.log(region);
+    for (let i = 0; i < region.length; i++) {
+        let tile = get_tile(region[i])
+        if (tile.classList.contains("candidates")) {
+            remove_candidate(region[i], n)
+        }
 
     }
 }
@@ -96,15 +117,36 @@ function remove_candidate(id, n) {
     let tile = get_tile(id)
     if (!tile.classList.contains("set")) {
         let nums = read_tile(tile)
-
-        let new_nums = nums.replace(n, "")
-        update_tile(get_tile(id), new_nums)
-        if (new_nums.length == 1) {
-            tile.classList.replace("candidates", "set")
+        if (!nums.len == 1) {
+            let new_nums = nums.replace(n, "")
+            update_tile(get_tile(id), new_nums)
+            if (new_nums.length == 1) {
+                tile.classList.replace("candidates", "set")
+            }
+            return true
         }
-        return true
     }
     return false
+}
+
+function get_row_id(id) {
+    let [x, y] = give_xy(id)
+    let ids = []
+
+    for (let i = 0; i < 9; i++) {
+        ids.push(give_id(i, y))
+    }
+    return ids
+}
+
+function get_col_id(id) {
+    let [x, y] = give_xy(id)
+    let ids = []
+
+    for (let i = 0; i < 9; i++) {
+        ids.push(give_id(x, i))
+    }
+    return ids
 }
 
 function get_box_id(id) {
@@ -115,8 +157,8 @@ function get_box_id(id) {
     let elements = document.getElementsByClassName(class_name)
 
     ids = [...elements].map(element => element.id)
-    console.log(ids);
 
+    return ids
 }
 
 function fill_candidates() {
@@ -130,6 +172,11 @@ function fill_candidates() {
     }
     console.clear()
 }
+
+/*
+end condition: return true
+check if valid: 
+*/
 
 // solving ------------
 async function solve(x = 0, y = 0) {
@@ -148,7 +195,7 @@ async function solve(x = 0, y = 0) {
     if (timer != 0) {
         await delay(timer)
     }
-
+    
     let id = give_id(x, y)
     let current_tile = get_tile(id)
     let is_full = read_tile(current_tile) !== ""
@@ -163,6 +210,8 @@ async function solve(x = 0, y = 0) {
 
         if (check_valid_placement(id, val)) {
             await update_tile(current_tile, val)
+            console.log("updating ", current_tile.id, " to ", val);
+
 
             if (await solve(x + 1, y)) {
                 return true
@@ -303,8 +352,6 @@ function read_tile(tile) {
 
 // changes value in tile
 async function update_tile(tile, val) {
-    console.log("updating ", tile.id, " to ", val);
-
     tile.children[0].innerHTML = val
 }
 
