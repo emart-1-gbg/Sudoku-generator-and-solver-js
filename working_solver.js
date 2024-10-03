@@ -1,4 +1,16 @@
+const delayOutput = document.querySelector("#delay-output");
+const delaySlider = document.querySelector("#delay-slider");
+let timer = 0
+delaySlider.value = timer
+
+delayOutput.textContent = delaySlider.value * 10
+delaySlider.addEventListener("input", (event) => {
+    delayOutput.textContent = event.target.value * 10; // Multiply by 10 for ms display
+    timer = delaySlider.value * 10
+});
+
 const grid = document.getElementById("grid")
+const test_file = "test_puzzles/hard.txt"
 
 // set the tiles and design
 window.onload = async function () {
@@ -20,7 +32,7 @@ window.onload = async function () {
             }
 
             // give the tile a class representing the box 
-            let block_class = "b" + get_box(give_id(x, y)).toString()
+            let block_class = "b" + get_n_box(give_id(x, y)).toString()
             tile.classList.add(block_class)
 
             // create text container inside tile, for better visuals
@@ -32,16 +44,22 @@ window.onload = async function () {
     set_grid()
 }
 
-
-function solve(x = 0, y = 0) {
+// solving ------------
+async function solve(x = 0, y = 0) {
     console.log("solving");
 
     if (x == 9) {
-        return solve(0, y + 1)
+        return await solve(0, y + 1)
     }
 
     if (y == 9) {
-        return true
+        if (check_solved()) {
+            return true
+        }
+    }
+
+    if (timer != 0) {
+        await delay(timer)
     }
 
     let id = give_id(x, y)
@@ -49,7 +67,7 @@ function solve(x = 0, y = 0) {
     let is_full = read_tile(current_tile) !== ""
 
     if (is_full) {
-        return solve(x + 1, y)
+        return await solve(x + 1, y)
     }
 
     for (let n = 1; n < 10; n++) {
@@ -57,28 +75,45 @@ function solve(x = 0, y = 0) {
         let val = n.toString()
 
         if (check_valid_placement(id, val)) {
-            update_tile(current_tile, val)
+            await update_tile(current_tile, val)
+            console.log("updating ", current_tile.id, " to ", val);
 
-            if (solve(x + 1, y)) {
-                console.log("return true");
+
+            if (await solve(x + 1, y)) {
                 return true
-
             }
-            update_tile(current_tile, "")
+            await update_tile(current_tile, "")
             console.log("backtrack");
+            if (timer != 0) {
+                await delay(timer)
+            }
         }
     }
     return false
 }
 
 function check_valid_placement(id, n) {
-    let current_row = get_row_num(id)
-    let current_col = get_col_num(id)
-    let current_box = get_box_num(id)
+    let row = get_row_num(id)
+    let col = get_col_num(id)
+    let box = get_box_num(id)
 
-    return !current_row.includes(n) &&
-        !current_col.includes(n) &&
-        !current_box.includes(n)
+    return !row.includes(n) &&
+        !col.includes(n) &&
+        !box.includes(n)
+}
+
+function check_solved() {
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) {
+            let id = give_id(x, y)
+            let tile = get_tile(id)
+            if (read_tile(tile) == "") {
+                return false
+            }
+        }
+    }
+    console.log("Puzzle complete");
+    return true
 }
 
 // get values in the same row
@@ -108,7 +143,7 @@ function get_col_num(id) {
 // get values in the same box
 function get_box_num(id) {
     let box = []
-    let box_n = "b" + get_box(id).toString()
+    let box_n = "b" + get_n_box(id).toString()
 
     for (let i = 0; i < 9; i++) {
         let tile = document.getElementsByClassName(box_n)[i]
@@ -121,7 +156,7 @@ function get_box_num(id) {
 }
 
 // get the box number of tile
-function get_box(id) {
+function get_n_box(id) {
     let [x, y] = give_xy(id)
     let block = 1
 
@@ -138,8 +173,9 @@ function get_box(id) {
 
 // for testing, read file and fill grid
 async function set_grid(file) {
-    file = "test_puzzles/medium1.txt";
-    let current_row;
+    clear_grid()
+    file = test_file
+    let current_row
 
     for (let y = 0; y < 9; y++) {
         // wait for the row to be read from file
@@ -168,6 +204,7 @@ async function read_file_row(file, row) {
     } catch (e) { console.error(e) }
 }
 
+// general functions -----------
 // generate random number 0-8
 function rand_num() {
     return Math.floor(Math.random() * 9)
@@ -180,9 +217,7 @@ function read_tile(tile) {
 }
 
 // changes value in tile
-function update_tile(tile, val) {
-    console.log("updating ", tile.id, " to ", val);
-
+async function update_tile(tile, val) {
     tile.children[0].innerHTML = val
 }
 
@@ -205,4 +240,15 @@ function give_xy(id) { // usage: let [x, y] = give_xy(id)
 // delays operations, for visualisation
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function clear_grid() {
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) {
+            let id = give_id(x, y)
+            let tile = document.getElementById(id)
+            update_tile(tile, "")
+            tile.classList.remove("hint", "candidates")
+        }
+    }
 }

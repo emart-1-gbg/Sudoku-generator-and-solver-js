@@ -85,12 +85,13 @@ button{
 }
 
 .candidates{
-    color: rgba(0, 0, 0, 0.436);
+    color: rgba(0, 0, 0, 0.527);
     font-size: 1.5vh !important;
 }
 
-.hint{
-    background-color: rgba(9, 9, 9, 0.037) !important; 
+.hint{    
+    color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(255, 0, 0, 0.096) !important; 
 }
 
 .set{

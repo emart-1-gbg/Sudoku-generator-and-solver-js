@@ -44,59 +44,98 @@ window.onload = async function () {
 }
 
 /*
-fill with all candidates        done
-pick random tile and set n      done
-remove n from region            done
-pick between x, y               done
-pick random tile in same x/y    --
-if its full, pick again         --
-set n+1 to next tile            --
-backtrack if invalid            --
-recurse                         --
+fill with all candidates                done
+pick random tile check if n is valid    done
+if valid, set n & remove from region    --
+pick between x, y               
+pick random tile in same x/y    
+if its full, pick again         
+set n+1 to next tile            
+backtrack if invalid            
+recurse                         
 profit???
 */
 
-function generate(x = rand_num(), y = rand_num(), n = 1) {
+function generate_btn() {
     fill_candidates()
+    generate()
+}
+
+function generate(x = rand_num(), y = rand_num(), n = 1) {
+    console.log("generating");
 
     let id = give_id(x, y)
-    let tile = get_tile(id)
+    let current_tile = get_tile(id)
 
-    if (tile.classList.contains("candidates")) {
-        generate(n=n)
-        return false
+    if (check_available(id, n)) {
+        let candidate_list = read_tile(current_tile)
+        set_val(id, n)
+
+        undo_set(id)
+        update_tile(id, candidate_list)
     }
-    
-    
-    set_candidate(id, n)
 
-    let next_ids = []
+    let next_id = get_next(id)
+    console.log("next id: ", next_id);
+    let [next_x, next_y] = give_xy(next_id)
+    
 
+    return false
+}
+
+function get_next(last_id) {
+    let [x, y] = give_xy(last_id)
 
     if (Math.floor(Math.random() * 2) == 0) {
-        for (let i = 0; i < 9; i++) {
-            next_ids.push(give_id(i, y))
-        }
+        x = rand_num()
     } else {
-        for (let i = 0; i < 9; i++) {
-            next_ids.push(give_id(x, i))
-        }
+        y = rand_num()
     }
-    
-    next_ids.pop(next_ids.indexOf(id))
-    console.log("next", next_ids);
 
-    let next = next_ids[Math.floor(Math.random()*next_ids.length)]
-    let [next_x, next_y] = give_xy(next)
-    generate(next_x, next_y, n++)
+    while (true) {
+        if (x == 9) {
+            x = 0
+        }
+        if (y == 9) {
+            y = 0
+        }
 
+        new_id = give_id(x, y)
+        if (get_tile(new_id).classList.contains("candidates")) {
+            return new_id
+        }
+        x++
+        y++
+    }
 }
 
 function check_available(id, n) {
-    null
+    let region = get_region(id)
+    let a = 0
+    for (let i = 0; i < region.length; i++) { // check each id
+        let tile = get_tile(region[i])
+
+        if (tile.classList.contains("candidates")) { // if its not set
+            let candidates = read_tile(tile) // available nubmers
+
+            for (let j = 0; j < candidates.length; j++) {
+                if (candidates[j] == n) {
+                    a++
+                }
+            }
+        }
+    }
+
+    if (region.length == a) {
+        console.log("valid");
+        return true
+    } else {
+        console.log("in-valid");
+        return false
+    }
 }
 
-function set_candidate(id, n) {
+function set_val(id, n) {
     let tile = get_tile(id)
     tile.classList.remove("candidates")
     update_tile(tile, n)
@@ -104,22 +143,23 @@ function set_candidate(id, n) {
 }
 
 function eliminate_candidates(id, n) {
-    let region = [...get_row_id(id), ...get_col_id(id), ...get_box_id(id)]
-    console.log(region);
+    let region = get_region(id)
     for (let i = 0; i < region.length; i++) {
         let tile = get_tile(region[i])
         if (tile.classList.contains("candidates")) {
             remove_candidate(region[i], n)
         }
-
     }
 }
 
-function testa() {
-    for (let i = 0; i < 9; i++) {
-        remove_candidate("0-0", i)
+function undo_set(id, candidates) {
+    let tile = get_tile(id)
+    tile.classList.replace("set", "candidates")
+    update_tile(tile, candidates)
+}
 
-    }
+function get_region(id) {
+    return [...get_row_id(id), ...get_col_id(id), ...get_box_id(id)]
 }
 
 function remove_candidate(id, n) {
@@ -161,7 +201,6 @@ function get_col_id(id) {
 function get_box_id(id) {
     let class_name = "b" + get_n_box(id).toString()
     let ids = []
-    console.log(class_name);
 
     let elements = document.getElementsByClassName(class_name)
 
@@ -181,11 +220,6 @@ function fill_candidates() {
     }
     console.clear()
 }
-
-/*
-end condition: return true
-check if valid: 
-*/
 
 // solving ------------
 async function solve(x = 0, y = 0) {
@@ -236,13 +270,13 @@ async function solve(x = 0, y = 0) {
 }
 
 function check_valid_placement(id, n) {
-    let current_row = get_row_num(id)
-    let current_col = get_col_num(id)
-    let current_box = get_box_num(id)
+    let row = get_row_num(id)
+    let col = get_col_num(id)
+    let box = get_box_num(id)
 
-    return !current_row.includes(n) &&
-        !current_col.includes(n) &&
-        !current_box.includes(n)
+    return !row.includes(n) &&
+        !col.includes(n) &&
+        !box.includes(n)
 }
 
 function check_solved() {
