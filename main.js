@@ -68,37 +68,77 @@ async function generate() {
         await delay(timer)
     }
 
+    // list of ids with the least number of candidates (options to choose from)
     let tiles_least_candidates = await tiles_with_least_candidates()
 
+    // if there are none its complete
     if (tiles_least_candidates.length == 0) {
+        console.log("Complete");
         return true
     }
 
+    // random index for next id
     let rand_i = Math.floor(Math.random() * tiles_least_candidates.length)
+    // id of next tile
     let current_id = tiles_least_candidates[rand_i]
-    let candidate = await read_tile(get_tile(current_id))[0]
+    // candidates of next tile
+    let candidates = await read_tile(get_tile(current_id))
+    // first or lowest value candidate
+    let candidate = candidates[0]
 
-    if (candidate.length == 0) {
-        return false
+    if (candidate) {
+        set_tile(current_id, candidate)
+        console.log("Setting ", current_id, " to ", candidate);
+
+        if (await generate()) {
+            return true
+        }
+        console.log("Backtrack");
+        await delay(3000)
+                
+        undo(current_id, candidate)
     }
-
-    // IMPLEMENT BACKTRACKING 
     
-    set_tile(current_id, candidate)
-
-    if (generate()){
-        return true
-    }
     return false
 }
 
-function undo(id) {
-    let tile = get_tile(id);
+function undo(id, to_add) {
+    let region = get_region_ids(id)
+
+    region.forEach(id => {
+        
+    });
 }
+
+
+//     let tile = get_tile(id);
+    
+//     console.log(prev);
+    
+//     cand_list = null
+    
+//     let missing = prev.filter(x => cand_list.includes(x))
+//     console.log("adding: ", missing);
+    
+    
+//     add_candidates(id, cand_list);
+//     update_tile(tile, missing);
+//     tile.classList.add("candidates");
+//     console.log("Reverting ", id)
+// }
+
+// function add_candidates(id, n) {
+//     let ids = get_region_ids(id)
+//     ids.forEach(id => {
+//         let tile = get_tile(id)
+//         let to = n.toString() + read_tile(tile)
+
+//         update_tile(get_tile(id), to)
+//     });
 
 async function tiles_with_least_candidates() {
     let tiles = document.querySelectorAll('.candidates')
-    
+
     let lowest = 9
     let lowest_list = []
 
@@ -127,7 +167,7 @@ function set_tile(id, n) {
 }
 
 function eliminate_candidates(id, n) {
-    let region = get_region(id);
+    let region = get_region_ids(id);
 
     // Eliminate `n` from all tiles in the same row, col, and box
     for (let i = 0; i < region.length; i++) {
@@ -139,7 +179,7 @@ function eliminate_candidates(id, n) {
 }
 
 function check_available(id, n) {
-    let region = get_region(id);
+    let region = get_region_ids(id);
 
     // Check if `n` can be placed in the current tile's region
     for (let i = 0; i < region.length; i++) {
@@ -151,7 +191,7 @@ function check_available(id, n) {
     return true;  // `n` is available for placement
 }
 
-function get_region(id) {
+function get_region_ids(id) {
     // Combine the row, col, and box IDs
     return [...get_row_id(id), ...get_col_id(id), ...get_box_id(id)];
 }
@@ -162,7 +202,7 @@ function remove_candidate(id, n) {
         let nums = read_tile(tile);
         let new_nums = nums.replace(n.toString(), "");
         update_tile(get_tile(id), new_nums);
-    
+
         return true;
     }
     return false;
