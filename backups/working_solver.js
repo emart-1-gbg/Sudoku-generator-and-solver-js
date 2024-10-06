@@ -1,4 +1,3 @@
-
 const delayOutput = document.querySelector("#delay-output");
 const delaySlider = document.querySelector("#delay-slider");
 let timer = 0

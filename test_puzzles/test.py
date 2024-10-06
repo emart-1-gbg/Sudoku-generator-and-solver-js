@@ -50,4 +50,3 @@ def is_valid_sudoku(grid):
 is_valid = is_valid_sudoku(sudoku_grid)
 
 is_valid
-

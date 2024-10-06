@@ -1,4 +1,3 @@
-
 const delayOutput = document.querySelector("#delay-output");
 const delaySlider = document.querySelector("#delay-slider");
 let timer = 0
@@ -62,130 +61,121 @@ function generate_btn() {
     generate()
 }
 
-function generate() {
-    console.log("Generating...");
+function generate(x = rand_num(), y = rand_num(), n = 1) {
+    console.log("generating");
 
-    // Find the tile(s) with the fewest candidates
-    let tiles_with_fewest_candidates = find_tiles_with_fewest_candidates();
+    let id = give_id(x, y)
+    let current_tile = get_tile(id)
 
-    if (tiles_with_fewest_candidates.length === 0) {
-        // If no more candidate tiles, the grid is fully filled
-        console.log("Grid is fully filled!");
-        return true;
+    if (check_available(id, n)) {
+        let candidate_list = read_tile(current_tile)
+        set_val(id, n)
+
+        undo_set(id)
+        update_tile(id, candidate_list)
     }
 
-    // Randomly pick a tile from the list of tiles with the fewest candidates
-    let random_tile = tiles_with_fewest_candidates[Math.floor(Math.random() * tiles_with_fewest_candidates.length)];
-    let id = random_tile.id;
-    let candidates = read_tile(random_tile).split('');  // Get list of candidates for this tile
+    let next_id = get_next(id)
+    console.log("next id: ", next_id);
+    let [next_x, next_y] = give_xy(next_id)
+    
 
-    for (let i = 0; i < candidates.length; i++) {
-        let candidate = parseInt(candidates[i]);
-
-        if (check_available(id, candidate)) {
-            set_val(id, candidate);
-
-            // Recursively try to generate for the next tile
-            if (generate()) {
-                return true;  // Success
-            }
-
-            // Backtrack if unsuccessful
-            undo_set(id, candidates.join(''));
-        }
-    }
-
-    return false;  // Trigger backtracking if no candidates work
+    return false
 }
 
-function find_tiles_with_fewest_candidates() {
-    let tiles = document.querySelectorAll('.candidates');
-    let min_candidates = 9;  // Start with the maximum possible number of candidates
-    let min_candidate_tiles = [];
+function get_next(last_id) {
+    let [x, y] = give_xy(last_id)
 
-    tiles.forEach(tile => {
-        let candidates = read_tile(tile);
-        if (candidates.length < min_candidates) {
-            // Found a tile with fewer candidates, reset the list
-            min_candidates = candidates.length;
-            min_candidate_tiles = [tile];
-        } else if (candidates.length === min_candidates) {
-            // Add tile to the list of tiles with the minimum candidates
-            min_candidate_tiles.push(tile);
+    if (Math.floor(Math.random() * 2) == 0) {
+        x = rand_num()
+    } else {
+        y = rand_num()
+    }
+
+    while (true) {
+        if (x == 9) {
+            x = 0
         }
-    });
+        if (y == 9) {
+            y = 0
+        }
 
-    return min_candidate_tiles;
+        new_id = give_id(x, y)
+        if (get_tile(new_id).classList.contains("candidates")) {
+            return new_id
+        }
+        x++
+        y++
+    }
+}
+
+function check_available(id, n) {
+    let region = get_region(id)
+    let a = 0
+    for (let i = 0; i < region.length; i++) { // check each id
+        let tile = get_tile(region[i])
+
+        if (tile.classList.contains("candidates")) { // if its not set
+            let candidates = read_tile(tile) // available nubmers
+
+            for (let j = 0; j < candidates.length; j++) {
+                if (candidates[j] == n) {
+                    a++
+                }
+            }
+        }
+    }
+
+    if (region.length == a) {
+        console.log("valid");
+        return true
+    } else {
+        console.log("in-valid");
+        return false
+    }
 }
 
 function set_val(id, n) {
-    let tile = get_tile(id);
-    tile.classList.remove("candidates");
-    update_tile(tile, n);
-    eliminate_candidates(id, n);
+    let tile = get_tile(id)
+    tile.classList.remove("candidates")
+    update_tile(tile, n)
+    eliminate_candidates(id, n)
 }
 
 function eliminate_candidates(id, n) {
-    let region = get_region(id);
-
-    // Eliminate `n` from all tiles in the same row, col, and box
+    let region = get_region(id)
     for (let i = 0; i < region.length; i++) {
-        let tile = get_tile(region[i]);
+        let tile = get_tile(region[i])
         if (tile.classList.contains("candidates")) {
-            remove_candidate(region[i], n);
+            remove_candidate(region[i], n)
         }
     }
 }
 
 function undo_set(id, candidates) {
-    let tile = get_tile(id);
-    tile.classList.replace("set", "candidates");
-    update_tile(tile, candidates);
-}
-
-function check_available(id, n) {
-    let region = get_region(id);
-
-    // Check if `n` can be placed in the current tile's region
-    for (let i = 0; i < region.length; i++) {
-        let tile = get_tile(region[i]);
-        if (tile.classList.contains("set") && read_tile(tile) == n) {
-            return false;
-        }
-    }
-
-    return true;  // `n` is available for placement
+    let tile = get_tile(id)
+    tile.classList.replace("set", "candidates")
+    update_tile(tile, candidates)
 }
 
 function get_region(id) {
-    // Combine the row, col, and box IDs
-    return [...get_row_id(id), ...get_col_id(id), ...get_box_id(id)];
+    return [...get_row_id(id), ...get_col_id(id), ...get_box_id(id)]
 }
 
 function remove_candidate(id, n) {
-    let tile = get_tile(id);
+    let tile = get_tile(id)
     if (!tile.classList.contains("set")) {
-        let nums = read_tile(tile);
-        let new_nums = nums.replace(n.toString(), "");
-        update_tile(get_tile(id), new_nums);
-        if (new_nums.length === 1) {
-            tile.classList.replace("candidates", "set");
-        }
-        return true;
-    }
-    return false;
-}
-
-function fill_candidates() {
-    clear_grid();
-    for (let y = 0; y < 9; y++) {
-        for (let x = 0; x < 9; x++) {
-            let tile = get_tile(give_id(x, y));
-            update_tile(tile, "123456789");
-            tile.classList.add("candidates");
+        let nums = read_tile(tile)
+        if (!nums.len == 1) {
+            let new_nums = nums.replace(n, "")
+            update_tile(get_tile(id), new_nums)
+            if (new_nums.length == 1) {
+                tile.classList.replace("candidates", "set")
+            }
+            return true
         }
     }
-    console.clear();
+    return false
 }
 
 function get_row_id(id) {
@@ -219,9 +209,17 @@ function get_box_id(id) {
     return ids
 }
 
-// Utility functions for managing the grid (get_tile, update_tile, give_id, give_xy, rand_num, etc.)
-// These need to be defined as per your grid structure.
-
+function fill_candidates() {
+    clear_grid()
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) {
+            let tile = get_tile(give_id(x, y))
+            update_tile(tile, "123456789")
+            tile.classList.add("candidates")
+        }
+    }
+    console.clear()
+}
 
 // solving ------------
 async function solve(x = 0, y = 0) {
