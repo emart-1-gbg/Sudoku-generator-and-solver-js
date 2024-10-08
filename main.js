@@ -107,7 +107,11 @@ function undo(id, to_add) {
     let region = get_region_ids(id)
 
     region.forEach(id => {
-        
+        let tile = get_tile(id)
+        let prev = read_tile(tile)
+        let next = prev + to_add
+        tile.classList.add("candidates")
+        update_tile(tile, next)
     });
 }
 
@@ -296,9 +300,9 @@ async function solve(x = 0, y = 0) {
             }
             await update_tile(current_tile, "")
             console.log("backtrack");
-            if (timer != 0) {
-                await delay(timer)
-            }
+            
+            
+            if (timer != 0) {await delay(timer)}
         }
     }
     return false
