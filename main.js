@@ -84,6 +84,8 @@ async function generate() {
     // first or lowest value candidate
     let candidate = candidates[0]
 
+    let previous_state = save_region_state(current_id); // Save the current state
+
     if (candidate) {
         set_tile(current_id, candidate)
         console.log("Setting ", current_id, " to ", candidate);
@@ -94,36 +96,34 @@ async function generate() {
         console.log("Backtrack");
         await delay(3000)
 
-        undo(current_id, candidate)
+        undo(current_id, previous_state)
     }
 
     return false
 }
 
-function undo(id, to_add) {
-    let region = get_region_ids(id)
-
-    region.forEach(id => {
-        let tile = get_tile(id)
-        let prev = read_tile(tile)
-        let next = prev + to_add
-        
-        console.log("Aaaaa", id, prev, to_add);
-        
-
-        update_tile(tile, next)
-        tile.classList.add("candidates")
+function undo(id, previous_state) {
+    // Restore the saved state of the region
+    previous_state.forEach(({ tile_id, candidates }) => {
+        let tile = get_tile(tile_id);
+        update_tile(tile, candidates);  // Restore the candidates
     });
+
+    console.log(`Undoing changes for tile ${id}`);
 }
+
 
 function save_region_state(id) {
     let region = get_region_ids(id)
     let state = []
-    region.forEach(a => {
-        let tile = get_tile(a)
-        let val = read_tile(tile)
-        state.push(val)
+
+    region.forEach(tile_id => {
+        let tile = get_tile(tile_id)
+        let candidates = read_tile(tile) 
+
+        state.push({ tile_id, candidates });
     });
+
     return state
 }
 
