@@ -15,7 +15,7 @@ const test_file = "test_puzzles/hard.txt"
 
 // set the tiles and design
 window.onload = async function () {
-    console.log("laod")
+    console.log("laod 2")
 
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
@@ -62,6 +62,53 @@ function generate_btn() {
     generate()
 }
 
+let n = [97, 98, 99, 100, 101, 102, 103, 104, 105]
+async function alt_generate() {
+    for (let b = 1; b <= 9; b++) {
+
+        if (timer != 0) { delay() }
+
+        let val_i = Math.floor(Math.random() * 9)
+
+        let val = String.fromCharCode(n.pop(n))
+        console.log("removed", val, "remaining: ", n);
+
+        let box_n = "b" + b.toString()
+        let ids = Array.from(document.getElementsByClassName(box_n))
+
+        let rand_box = ids[rand_num()]
+        console.log(rand_box);
+
+
+        let id = rand_box.id
+        let tile = get_tile(id)
+        if (read_tile(tile) == "") {
+            update_tile(tile, val)
+        } else {
+            continue
+        }
+
+        if (timer != 0) { await delay() }
+    }
+    solve()
+}
+
+function map_numbers() {
+    let nums = new Set(1, 2, 3, 4, 5, 6, 7, 8, 9)
+
+    
+    for (let i = 0; i < 9; i++) {
+        
+        let val = nums.pop()
+
+        nevv.push(val)
+
+    }
+
+    console.log(nevv);
+    
+}
+
 async function generate() {
     console.log("Generating...");
     if (timer != 0) { await delay() }
@@ -94,7 +141,7 @@ async function generate() {
         console.log("Backtrack");
         await delay(3000)
 
-        undo(current_id, candidate)
+        //undo(current_id, candidate)
     }
 
     return false
@@ -107,25 +154,11 @@ function undo(id, to_add) {
         let tile = get_tile(id)
         let prev = read_tile(tile)
         let next = prev + to_add
-        
-        console.log("Aaaaa", id, prev, to_add);
-        
-
-        update_tile(tile, next)
         tile.classList.add("candidates")
+        update_tile(tile, next)
     });
 }
 
-function save_region_state(id) {
-    let region = get_region_ids(id)
-    let state = []
-    region.forEach(a => {
-        let tile = get_tile(a)
-        let val = read_tile(tile)
-        state.push(val)
-    });
-    return state
-}
 
 async function tiles_with_least_candidates() {
     let tiles = document.querySelectorAll('.candidates')
@@ -270,9 +303,9 @@ async function solve(x = 0, y = 0) {
         return await solve(x + 1, y)
     }
 
-    for (let n = 1; n < 10; n++) {
+    for (let n = 97; n <= 105; n++) {
 
-        let val = n.toString()
+        let val = String.fromCharCode(n)
 
         if (check_valid_placement(id, val)) {
             await update_tile(current_tile, val)
