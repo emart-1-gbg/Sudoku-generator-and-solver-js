@@ -44,32 +44,19 @@ window.onload = async function () {
     }
 }
 
-/*
-fill with all candidates                done
-pick random tile check if n is valid    done
-if valid, set n & remove from region    --
-pick between x, y               
-pick random tile in same x/y    
-if its full, pick again         
-set n+1 to next tile            
-backtrack if invalid            
-recurse                         
-profit???
-*/
-
 function generate_btn() {
     fill_candidates()
     generate()
 }
 
 async function generate() {
-    console.log("Generating...");
+    console.log("Generating");
     if (timer != 0) { await delay() }
 
     // list of ids with the least number of candidates (options to choose from)
     let tiles_least_candidates = await tiles_with_least_candidates()
 
-    // if there are none its complete
+    // if there are none it's complete
     if (tiles_least_candidates.length == 0) {
         console.log("Complete");
         return true
@@ -77,28 +64,26 @@ async function generate() {
 
     // random index for next id
     let rand_i = Math.floor(Math.random() * tiles_least_candidates.length)
-    // id of next tile
     let current_id = tiles_least_candidates[rand_i]
-    // candidates of next tile
+
     let candidates = await read_tile(get_tile(current_id))
-    // first or lowest value candidate
-    let candidate = candidates[0]
 
     let previous_state = save_region_state(current_id); // Save the current state
 
-    if (candidate) {
+    for (let i = 0; i < candidates.length; i++) {
+        let candidate = candidates[i]
+
         set_tile(current_id, candidate)
-        console.log("Setting ", current_id, " to ", candidate);
+        //console.log("Setting ", current_id, " to ", candidate);
 
         if (await generate()) {
             return true
         }
         console.log("Backtrack");
-        await delay(3000)
+        await delay()
 
         undo(current_id, previous_state)
-    }
-
+    };
     return false
 }
 
@@ -107,9 +92,9 @@ function undo(id, previous_state) {
     previous_state.forEach(({ tile_id, candidates }) => {
         let tile = get_tile(tile_id);
         update_tile(tile, candidates);  // Restore the candidates
+        tile.classList.add("candidates")
     });
-
-    console.log(`Undoing changes for tile ${id}`);
+    console.log("Reverting for ", id);
 }
 
 
@@ -119,11 +104,10 @@ function save_region_state(id) {
 
     region.forEach(tile_id => {
         let tile = get_tile(tile_id)
-        let candidates = read_tile(tile) 
+        let candidates = read_tile(tile)
 
         state.push({ tile_id, candidates });
     });
-
     return state
 }
 
@@ -241,10 +225,6 @@ function get_box_id(id) {
 
     return ids
 }
-
-// Utility functions for managing the grid (get_tile, update_tile, give_id, give_xy, rand_num, etc.)
-// These need to be defined as per your grid structure.
-
 
 // solving ------------
 async function solve(x = 0, y = 0) {
@@ -438,8 +418,8 @@ function give_xy(id) { // usage: let [x, y] = give_xy(id)
 }
 
 // delays operations, for visualisation
-function delay() {
-    return new Promise(resolve => setTimeout(resolve, timer));
+function delay(time = timer) {
+    return new Promise(resolve => setTimeout(resolve, time));
 }
 
 function clear_grid() {
