@@ -44,18 +44,25 @@ window.onload = async function () {
     }
 }
 
+let remove_list = []
+let invalid_list = []
+
 async function remove_nums() {
     let x = rand_num()
     let y = rand_num()
-    let tile1 = get_tile(give_id(x, y))
+    let id1 = give_id(x, y)
+    let tile1 = get_tile(id1)
     let val1 = read_tile(tile1)
 
     let inv_x = 8 - x
     let inv_y = 8 - y
-    let tile2 = get_tile(give_id(inv_x, inv_y))
+    let id2 = give_id(inv_x, inv_y)
+    let tile2 = get_tile(id2)
     let val2 = read_tile(tile2)
 
     console.log(tile1, tile2);
+
+
 
     update_tile(tile1, "")
     update_tile(tile2, "")
@@ -64,16 +71,21 @@ async function remove_nums() {
     if (!await solve()) {
         console.log("nooooooooooooooooooo");
 
+        invalid_list.push(id1, id2)
         res = "invalid"
         return false
     }
-    
+
+    remove_list.push(id1, id2)
+
     console.log("yaya");
     tile1.classList.add(res)
     tile2.classList.add(res)
 
-    update_tile(tile1, "")
-    update_tile(tile2, "")
+    remove_list.forEach(id => {
+        let tile = get_tile(id)
+        update_tile(tile, "")
+    });
 
 }
 
