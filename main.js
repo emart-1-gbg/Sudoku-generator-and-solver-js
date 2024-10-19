@@ -44,6 +44,43 @@ window.onload = async function () {
     }
 }
 
+async function remove_nums() {
+    let x = rand_num()
+    let y = rand_num()
+    let tile1 = get_tile(give_id(x, y))
+    let val1 = read_tile(tile1)
+
+    let inv_x = 8 - x
+    let inv_y = 8 - y
+    let tile2 = get_tile(give_id(inv_x, inv_y))
+    let val2 = read_tile(tile2)
+
+    console.log(tile1, tile2);
+
+    update_tile(tile1, "")
+    update_tile(tile2, "")
+
+    let res = "removed"
+    if (!await solve()) {
+        console.log("nooooooooooooooooooo");
+
+        res = "invalid"
+        return false
+    }
+    
+    console.log("yaya");
+    tile1.classList.add(res)
+    tile2.classList.add(res)
+
+    update_tile(tile1, "")
+    update_tile(tile2, "")
+
+}
+
+
+
+// ---------------
+
 function generate_btn() {
     fill_candidates()
     generate()
@@ -80,7 +117,6 @@ async function generate() {
             return true
         }
         console.log("Backtrack");
-        await delay()
 
         undo(current_id, previous_state)
     };
@@ -153,18 +189,6 @@ function eliminate_candidates(id, n) {
     }
 }
 
-function check_available(id, n) {
-    let region = get_region_ids(id);
-
-    // Check if `n` can be placed in the current tile's region
-    for (let i = 0; i < region.length; i++) {
-        let tile = get_tile(region[i]);
-        if (tile.classList.contains("set") && read_tile(tile) == n) {
-            return false;
-        }
-    }
-    return true;  // `n` is available for placement
-}
 
 function get_region_ids(id) {
     // Combine the row, col, and box IDs
@@ -228,7 +252,6 @@ function get_box_id(id) {
 
 // solving ------------
 async function solve(x = 0, y = 0) {
-    console.log("solving");
 
     if (x == 9) {
         return await solve(0, y + 1)

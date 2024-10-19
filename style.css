@@ -97,3 +97,13 @@ button{
 .set{
     background-color: rgba(0, 128, 0, 0.106);
 }
+
+.removed {
+    background-color: rgba(173, 216, 230, 0.85);
+}
+
+.invalid {
+    background-color: rgba(255, 0, 0, 0.8);
+}
+
+

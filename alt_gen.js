@@ -124,7 +124,6 @@ async function generate() {
 
     // random index for next id
     let rand_i = Math.floor(Math.random() * tiles_least_candidates.length)
-    // id of next tile
     let current_id = tiles_least_candidates[rand_i]
     // candidates of next tile
     let candidates = await read_tile(get_tile(current_id))
@@ -202,18 +201,6 @@ function eliminate_candidates(id, n) {
     }
 }
 
-function check_available(id, n) {
-    let region = get_region_ids(id);
-
-    // Check if `n` can be placed in the current tile's region
-    for (let i = 0; i < region.length; i++) {
-        let tile = get_tile(region[i]);
-        if (tile.classList.contains("set") && read_tile(tile) == n) {
-            return false;
-        }
-    }
-    return true;  // `n` is available for placement
-}
 
 function get_region_ids(id) {
     // Combine the row, col, and box IDs
