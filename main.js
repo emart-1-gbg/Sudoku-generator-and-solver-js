@@ -61,8 +61,7 @@ async function remove_nums() {
     let val2 = read_tile(tile2)
 
     console.log(tile1, tile2);
-
-
+    
 
     update_tile(tile1, "")
     update_tile(tile2, "")
@@ -87,6 +86,31 @@ async function remove_nums() {
         update_tile(tile, "")
     });
 
+}
+
+function random_remove() {
+    let remove_list1 = []
+    for (let i = 0; i < 60; i++) {
+
+        let x = rand_num()
+        let y = rand_num()
+        let rand_id = give_id(x, y)
+
+        if (remove_list1.includes(rand_id)) {
+            continue
+        }
+        remove_list1.push(rand_id)
+        console.log(i);
+
+    }
+
+    remove_list1.forEach(id => {
+        let tile = get_tile(id)
+
+        update_tile(tile, "")
+    });
+
+    
 }
 
 
@@ -263,6 +287,7 @@ function get_box_id(id) {
 }
 
 // solving ------------
+let solutions = 0
 async function solve(x = 0, y = 0) {
 
     if (x == 9) {
@@ -270,7 +295,8 @@ async function solve(x = 0, y = 0) {
     }
 
     if (y == 9) {
-        if (check_solved()) {
+        if (check_filled()) {
+            solutions++
             return true
         }
     }
@@ -292,7 +318,6 @@ async function solve(x = 0, y = 0) {
         if (check_valid_placement(id, val)) {
             await update_tile(current_tile, val)
             console.log("updating ", current_tile.id, " to ", val);
-
 
             if (await solve(x + 1, y)) {
                 return true
@@ -317,7 +342,7 @@ function check_valid_placement(id, n) {
         !box.includes(n)
 }
 
-function check_solved() {
+function check_filled() {
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
             let id = give_id(x, y)
