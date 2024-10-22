@@ -98,6 +98,10 @@ button{
     background-color: rgba(0, 128, 0, 0.106);
 }
 
+.processing {
+    background-color: gray;
+}
+
 .removed {
     background-color: rgba(173, 216, 230, 0.85);
 }
