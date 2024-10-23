@@ -42,91 +42,94 @@ window.onload = async function () {
             tile.appendChild(text_container)
         }
     }
+    console.clear()
 }
 
-let remove_list = []
+let remove_list = [] // list of tiles that can be removed
+let solutions = 0
 
 async function finalise_puzzle() {
-    let stay_list = []
-
+    let stay_list = [] // will be final puzzle
+    // all of the ids are in the list initially
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
             let id_p = give_id(j, i)
-            let tile_p = get_tile(id_p)
-            let val_p = read_tile(tile_p)
 
-            stay_list.push([id_p, val_p])
+            stay_list.push(id_p)
         }
     }
-
-    let [id, inv_id] = remove_ids()
-    let tile = get_tile(id)
-    let inv_tile = get_tile(inv_id)
-
-    update_tile(tile, "")
-    update_tile(inv_tile, "")
-
-    tile.classList.add("processing")
-    inv_tile.classList.add("processing")
+    
+    await remove_ids(stay_list)
+    
 }
 
-async function remove_ids() {
-    while (true) {
-        let x = rand_num()
-        let y = rand_num()
-        let id1 = give_id(x, y)
 
-        if (!remove_list.includes(id1)) {
-            continue
-        }
+async function remove_ids(stay_list) {
+    let list = stay_list
 
-        let inv_x = 8 - x
-        let inv_y = 8 - y
-        let id2 = give_id(inv_x, inv_y)
+    for (let j = 0; j < 81; j++) {
+        console.log(j);
+        
+        if (timer != 0) { await delay() }
 
-        console.log(id1, id2);
+        console.log(list);
+        
 
-        return [id1, id2]
-    }
-
-
-    if (safszh) {
-        update_tile(tile1, "")
-        update_tile(tile2, "")
-
+        let rand_i = Math.floor(Math.random() * list.length)
+        
+        let id = list[rand_i]
+        let tile = get_tile(id)    
+        let val = read_tile(tile)
+    
+        let inv_id = get_inv_id(id)
+        let inv_tile = get_tile(inv_id)
+        let inv_val = read_tile(inv_tile)
+    
+        console.log(`picked ${id}, ${inv_id}`);
+    
+    
+        update_tile(tile, "")
+        update_tile(inv_tile, "")
+    
+        tile.classList.add("processing")
+        inv_tile.classList.add("processing")
+    
+    
         let res = "removed"
-        if (!await find_n_solutions()) {
+        solutions = 0
+        if (!await has_1_solution()) {
             console.log("nooooooooooooooooooo");
-
-            invalid_list.push(id1, id2)
-            res = "invalid"
-            return false
+         
+            tile.classList.add("invalid")
+            inv_tile.classList.add("invalid")
+         
+            update_tile(tile, val)
+            update_tile(inv_tile, inv_val)
+    
         }
-
-        remove_list.push(id1, id2)
-
+    
         console.log("yaya");
-        tile1.classList.add(res)
-        tile2.classList.add(res)
-
-        remove_list.forEach(id => {
-            let tile = get_tile(id)
-            update_tile(tile, "")
-        });
-
-        invalid_list.forEach(id => {
-            let tile = get_tile(id)
-            update_tile()
-        });
+       
+        list.pop(rand_i)
+       
+        tile.classList.add("removed")
+        inv_tile.classList.add("removed")
     }
 
 }
 
-let solutions = 0
-async function find_n_solutions(x = 0, y = 0) { // start from 0 0
+function get_inv_id(id) {
+    let [x, y] = give_xy(id)
+    let inv_x = 8 - x
+    let inv_y = 8 - y
+
+    return give_id(inv_x, inv_y)
+}
+
+async function has_1_solution(x = 0, y = 0) { // start from 0 0
 
     if (x == 9) {
-        return await find_n_solutions(0, y + 1)
+        return await has_1_solution(0, y + 1)
     }
 
     if (y == 9) {
@@ -137,13 +140,17 @@ async function find_n_solutions(x = 0, y = 0) { // start from 0 0
         return false
     }
 
+    if (solutions > 1) {
+        return false
+    }
+
     // get info on current tile
     let id = give_id(x, y)
     let current_tile = get_tile(id)
     let is_full = read_tile(current_tile) !== ""
 
     if (is_full) { // go to next of its full
-        return await find_n_solutions(x + 1, y) // try palcing the next number
+        return await has_1_solution(x + 1, y) // try palcing the next number
     }
 
     for (let n = 1; n < 10; n++) { // try 1-9
@@ -153,7 +160,7 @@ async function find_n_solutions(x = 0, y = 0) { // start from 0 0
             await update_tile(current_tile, val) // try placing n
             // (or place a valid number)
 
-            await find_n_solutions(x + 1, y)
+            await has_1_solution(x + 1, y)
 
             // if path is not valid, undo until 
             await update_tile(current_tile, "")
