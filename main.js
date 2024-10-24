@@ -45,77 +45,89 @@ window.onload = async function () {
     console.clear()
 }
 
-let remove_list = [] // list of tiles that can be removed
 let solutions = 0
 
 async function finalise_puzzle() {
     let stay_list = [] // will be final puzzle
     // all of the ids are in the list initially
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 4; i++) {
         for (let j = 0; j < 9; j++) {
-            let id_p = give_id(j, i)
 
+            let id_p = give_id(j, i)
             stay_list.push(id_p)
         }
     }
-    
+
+    for (let k = 0; k < 4; k++) {
+        let id_p = give_id(k, 4)
+        stay_list.push(id_p)
+    }    
+
     await remove_ids(stay_list)
-    
+
 }
 
 
-async function remove_ids(stay_list) {
-    let list = stay_list
+async function remove_ids(list) {
+    update_tile(get_tile("4-4"), "")
+    get_tile("4-4").classList.add("removed")
 
-    for (let j = 0; j < 81; j++) {
+    let n_invalid = 0
+
+    let j = 0
+    while (list.length > 0) {
+
         console.log(j);
-        
-        if (timer != 0) { await delay() }
-
-        console.log(list);
-        
 
         let rand_i = Math.floor(Math.random() * list.length)
-        
+
         let id = list[rand_i]
-        let tile = get_tile(id)    
+        let tile = get_tile(id)
         let val = read_tile(tile)
-    
+
         let inv_id = get_inv_id(id)
         let inv_tile = get_tile(inv_id)
         let inv_val = read_tile(inv_tile)
-    
+
         console.log(`picked ${id}, ${inv_id}`);
-    
-    
+
+
         update_tile(tile, "")
         update_tile(inv_tile, "")
-    
+
         tile.classList.add("processing")
         inv_tile.classList.add("processing")
-    
-    
+
+        await delay()
+
         let res = "removed"
         solutions = 0
         if (!await has_1_solution()) {
-            console.log("nooooooooooooooooooo");
-         
-            tile.classList.add("invalid")
-            inv_tile.classList.add("invalid")
-         
+            console.log("Multiple solutions, invalid");
+
+            res = "invalid"
+
             update_tile(tile, val)
             update_tile(inv_tile, inv_val)
-    
+        } else {
+            console.log("Valid");
         }
-    
-        console.log("yaya");
-       
-        list.pop(rand_i)
-       
-        tile.classList.add("removed")
-        inv_tile.classList.add("removed")
+
+        list.splice(rand_i, 1)
+
+        tile.classList.replace("processing", res)
+        inv_tile.classList.replace("processing", res)
+
+        j++
     }
 
+    console.log("\nCreated puzzle");
+
+
+}
+
+function show_final_puzzle() {
+    
 }
 
 function get_inv_id(id) {
@@ -126,16 +138,15 @@ function get_inv_id(id) {
     return give_id(inv_x, inv_y)
 }
 
-async function has_1_solution(x = 0, y = 0) { // start from 0 0
+async function has_1_solution(x = 0, y = 0, count = 0) { // start from 0 0       
 
     if (x == 9) {
-        return await has_1_solution(0, y + 1)
+        return await has_1_solution(0, y + 1, count+1)
     }
 
     if (y == 9) {
         if (check_filled()) {
             solutions++
-            console.log(`Soliution found ${solutions}`);
         }
         return false
     }
@@ -150,7 +161,7 @@ async function has_1_solution(x = 0, y = 0) { // start from 0 0
     let is_full = read_tile(current_tile) !== ""
 
     if (is_full) { // go to next of its full
-        return await has_1_solution(x + 1, y) // try palcing the next number
+        return await has_1_solution(x + 1, y, count+1) // try palcing the next number
     }
 
     for (let n = 1; n < 10; n++) { // try 1-9
@@ -160,7 +171,7 @@ async function has_1_solution(x = 0, y = 0) { // start from 0 0
             await update_tile(current_tile, val) // try placing n
             // (or place a valid number)
 
-            await has_1_solution(x + 1, y)
+            await has_1_solution(x + 1, y, count+1)
 
             // if path is not valid, undo until 
             await update_tile(current_tile, "")
@@ -376,6 +387,7 @@ async function solve(x = 0, y = 0) { // start from 0 0
 
     if (y == 9) {
         if (check_filled()) {
+            console.log("Puzzle complete");
             return true
         }
     }
@@ -435,7 +447,6 @@ function check_filled() {
             }
         }
     }
-    console.log("Puzzle complete");
     return true
 }
 
