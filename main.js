@@ -11,7 +11,7 @@ delaySlider.addEventListener("input", (event) => {
 });
 
 const grid = document.getElementById("grid")
-const test_file = "test_puzzles/aa.txt"
+const test_file = "test_puzzles/hardest.txt"
 
 // set the tiles and design
 window.onload = async function () {
@@ -61,7 +61,7 @@ async function finalise_puzzle() {
     for (let k = 0; k < 4; k++) {
         let id_p = give_id(k, 4)
         stay_list.push(id_p)
-    }    
+    }
 
     await remove_ids(stay_list)
 
@@ -127,7 +127,12 @@ async function remove_ids(list) {
 }
 
 function show_final_puzzle() {
-    
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) { 
+            let id = give_id(x, y)
+
+        }
+    }
 }
 
 function get_inv_id(id) {
@@ -141,7 +146,7 @@ function get_inv_id(id) {
 async function has_1_solution(x = 0, y = 0, count = 0) { // start from 0 0       
 
     if (x == 9) {
-        return await has_1_solution(0, y + 1, count+1)
+        return await has_1_solution(0, y + 1, count + 1)
     }
 
     if (y == 9) {
@@ -161,7 +166,7 @@ async function has_1_solution(x = 0, y = 0, count = 0) { // start from 0 0
     let is_full = read_tile(current_tile) !== ""
 
     if (is_full) { // go to next of its full
-        return await has_1_solution(x + 1, y, count+1) // try palcing the next number
+        return await has_1_solution(x + 1, y, count + 1) // try palcing the next number
     }
 
     for (let n = 1; n < 10; n++) { // try 1-9
@@ -171,7 +176,7 @@ async function has_1_solution(x = 0, y = 0, count = 0) { // start from 0 0
             await update_tile(current_tile, val) // try placing n
             // (or place a valid number)
 
-            await has_1_solution(x + 1, y, count+1)
+            await has_1_solution(x + 1, y, count + 1)
 
             // if path is not valid, undo until 
             await update_tile(current_tile, "")
@@ -224,6 +229,7 @@ async function generate() {
     // if there are none it's complete
     if (tiles_least_candidates.length == 0) {
         console.log("Complete");
+        finalise_puzzle()
         return true
     }
 
@@ -342,6 +348,8 @@ function fill_candidates() {
             let tile = get_tile(give_id(x, y));
             update_tile(tile, "123456789");
             tile.classList.add("candidates");
+            tile.classList.remove("invalid");
+            tile.classList.remove("removed");
         }
     }
     console.clear();
