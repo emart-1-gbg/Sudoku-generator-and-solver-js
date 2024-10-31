@@ -258,6 +258,24 @@ async function generate() {
     return false
 }
 
+function online_check(filler) {
+    let s = ""
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 9; x++) { 
+            let id = give_id(x, y)
+            let tile = get_tile(id)
+            let val = read_tile(tile)
+
+            if (val == "") {
+                val = filler
+            }
+
+            s+=val
+        }
+    }
+    console.log(s);
+}
+
 function undo(id, previous_state) {
     // Restore the saved state of the region
     previous_state.forEach(({ tile_id, candidates }) => {
