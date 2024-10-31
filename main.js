@@ -229,6 +229,7 @@ async function generate() {
     // if there are none it's complete
     if (tiles_least_candidates.length == 0) {
         console.log("Complete");
+        await delay(timer * 2)
         finalise_puzzle()
         return true
     }
@@ -250,8 +251,8 @@ async function generate() {
         if (await generate()) {
             return true
         }
-        console.log("Backtrack");
 
+        console.log("Backtrack");
         undo(current_id, previous_state)
     };
     return false
