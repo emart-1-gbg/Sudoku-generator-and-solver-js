@@ -11,7 +11,7 @@ delaySlider.addEventListener("input", (event) => {
 });
 
 const grid = document.getElementById("grid")
-const test_file = "test_puzzles/hardest.txt"
+const test_file = "test_puzzles/hard.txt"
 
 // set the tiles and design
 window.onload = async function () {
@@ -128,7 +128,7 @@ async function remove_ids(list) {
 
 function show_final_puzzle() {
     for (let y = 0; y < 9; y++) {
-        for (let x = 0; x < 9; x++) { 
+        for (let x = 0; x < 9; x++) {
             let id = give_id(x, y)
 
         }
@@ -389,6 +389,7 @@ function get_box_id(id) {
 // solving ------------
 async function solve(x = 0, y = 0) { // start from 0 0
 
+    // Base cases 
     if (x == 9) {
         return await solve(0, y + 1)
     }
@@ -400,8 +401,6 @@ async function solve(x = 0, y = 0) { // start from 0 0
         }
     }
 
-    if (timer != 0) { await delay() }
-
     // get info on current tile
     let id = give_id(x, y)
     let current_tile = get_tile(id)
@@ -411,6 +410,10 @@ async function solve(x = 0, y = 0) { // start from 0 0
         return await solve(x + 1, y) // try palcing the next number
     }
 
+    if (timer != 0) { await delay() }
+
+
+    // Elimination loop
     for (let n = 1; n < 10; n++) { // try 1-9
         let val = n.toString()
 
@@ -424,14 +427,13 @@ async function solve(x = 0, y = 0) { // start from 0 0
                 return true
             }
 
-            // if path is not valid, undo until 
-            await update_tile(current_tile, "")
-            console.log("backtrack");
-
-
-            if (timer != 0) { await delay() }
+            if (timer != 0) { await delay(timer / 2) }
         }
     }
+    // if path is not valid, undo until 
+    await update_tile(current_tile, "")
+    console.log("backtrack");
+
     return false
 }
 
