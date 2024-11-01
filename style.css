@@ -99,15 +99,19 @@ button{
 }
 
 .processing {
-    background-color: gray;
+    background-color: rgba(128, 128, 128, 0.7);
 }
 
 .removed {
-    background-color: rgba(173, 216, 230, 0.85);
+    background-color: rgba(190, 225, 236, 0.4);
 }
 
 .invalid {
-    background-color: rgba(255, 0, 0, 0.8);
+    background-color: rgba(32, 192, 112, 0.4);
+}
+
+.invalid > .text_container {
+    color: rgba(75, 75, 75, 0.9);
 }
 
 
