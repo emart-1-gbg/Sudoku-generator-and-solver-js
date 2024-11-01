@@ -144,7 +144,7 @@ function get_inv_id(id) {
 }
 
 async function has_1_solution(x = 0, y = 0, count = 0) { // start from 0 0       
-
+    
     if (x == 9) {
         return await has_1_solution(0, y + 1, count + 1)
     }
@@ -206,7 +206,6 @@ function random_remove() {
 
         update_tile(tile, "")
     });
-
 
 }
 
