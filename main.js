@@ -316,7 +316,7 @@ async function tiles_with_least_candidates() {
                 lowest_list.push(tile.id)
             } else if (len == lowest) {
                 lowest_list.push(tile.id)
-            }
+            } 
         }
     });
     return lowest_list
@@ -447,10 +447,10 @@ async function solve(x = 0, y = 0) { // start from 0 0
 
             if (timer != 0) { await delay(timer / 2) }
         }
+        // if path is not valid, undo until 
+        await update_tile(current_tile, "")
+        console.log("backtrack");
     }
-    // if path is not valid, undo until 
-    await update_tile(current_tile, "")
-    console.log("backtrack");
 
     return false
 }
