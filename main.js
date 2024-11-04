@@ -72,8 +72,6 @@ async function remove_ids(list) {
     update_tile(get_tile("4-4"), "")
     get_tile("4-4").classList.add("removed")
 
-    let n_invalid = 0
-
     let j = 0
     while (list.length > 0) {
 
@@ -123,16 +121,6 @@ async function remove_ids(list) {
 
     console.log("\nCreated puzzle");
 
-
-}
-
-function show_final_puzzle() {
-    for (let y = 0; y < 9; y++) {
-        for (let x = 0; x < 9; x++) {
-            let id = give_id(x, y)
-
-        }
-    }
 }
 
 function get_inv_id(id) {
