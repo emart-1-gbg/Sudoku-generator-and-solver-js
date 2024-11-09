@@ -15,7 +15,7 @@ const test_file = "test_puzzles/hard.txt"
 
 // set the tiles and design
 window.onload = async function () {
-    console.log("laod")
+    console.log("load")
 
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
@@ -45,7 +45,6 @@ window.onload = async function () {
     console.clear()
 }
 
-let solutions = 0
 
 async function finalise_puzzle() {
     let stay_list = [] // will be final puzzle
@@ -354,8 +353,6 @@ function fill_candidates() {
             let tile = get_tile(give_id(x, y));
             update_tile(tile, "123456789");
             tile.classList.add("candidates");
-            tile.classList.remove("invalid");
-            tile.classList.remove("removed");
         }
     }
     console.clear();
@@ -598,7 +595,7 @@ function clear_grid() {
             let id = give_id(x, y)
             let tile = document.getElementById(id)
             update_tile(tile, "")
-            tile.classList.remove("hint", "candidates")
+            tile.classList.remove("hint", "candidates", "invalid", "removed")
         }
     }
 }
