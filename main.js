@@ -1,13 +1,13 @@
 
-const delayOutput = document.querySelector("#delay-output");
-const delaySlider = document.querySelector("#delay-slider");
-let timer = 0
-delaySlider.value = timer
+const delay_label = document.querySelector("#delay-label");
+const delay_slider = document.querySelector("#delay-slider");
 
-delayOutput.textContent = delaySlider.value * 10
-delaySlider.addEventListener("input", (event) => {
-    delayOutput.textContent = event.target.value * 10; // Multiply by 10 for ms display
-    timer = delaySlider.value * 10
+let timer = delay_slider.value
+delay_label.textContent = timer
+
+delay_slider.addEventListener("input", (e) => {
+    delay_label.textContent = delay_slider.value; // ms display
+    timer = delay_slider.value 
 });
 
 const grid = document.getElementById("grid")
@@ -20,7 +20,7 @@ window.onload = async function () {
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
             let tile = document.createElement("div")
-            tile.id = give_id(x, y)
+            tile.id = get_id(x, y)
             tile.classList.add("tile")
             grid.appendChild(tile)
 
@@ -33,7 +33,7 @@ window.onload = async function () {
             }
 
             // give the tile a class representing the box 
-            let block_class = "b" + get_n_box(give_id(x, y)).toString()
+            let block_class = "b" + get_n_box(get_id(x, y)).toString()
             tile.classList.add(block_class)
 
             // create text container inside tile, for better visuals
@@ -52,13 +52,13 @@ async function finalise_puzzle() {
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < 9; j++) {
 
-            let id_p = give_id(j, i)
+            let id_p = get_id(j, i)
             stay_list.push(id_p)
         }
     }
 
     for (let k = 0; k < 4; k++) {
-        let id_p = give_id(k, 4)
+        let id_p = get_id(k, 4)
         stay_list.push(id_p)
     }
 
@@ -123,11 +123,11 @@ async function remove_ids(list) {
 }
 
 function get_inv_id(id) {
-    let [x, y] = give_xy(id)
+    let [x, y] = get_xy(id)
     let inv_x = 8 - x
     let inv_y = 8 - y
 
-    return give_id(inv_x, inv_y)
+    return get_id(inv_x, inv_y)
 }
 
 async function has_1_solution(x = 0, y = 0, count = 0) { // start from 0 0       
@@ -148,7 +148,7 @@ async function has_1_solution(x = 0, y = 0, count = 0) { // start from 0 0
     }
 
     // get info on current tile
-    let id = give_id(x, y)
+    let id = get_id(x, y)
     let current_tile = get_tile(id)
     let is_full = read_tile(current_tile) !== ""
 
@@ -178,7 +178,7 @@ function random_remove() {
 
         let x = rand_num()
         let y = rand_num()
-        let rand_id = give_id(x, y)
+        let rand_id = get_id(x, y)
 
         if (remove_list1.includes(rand_id)) {
             continue
@@ -248,7 +248,7 @@ function online_check(filler) {
     let s = ""
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) { 
-            let id = give_id(x, y)
+            let id = get_id(x, y)
             let tile = get_tile(id)
             let val = read_tile(tile)
 
@@ -350,7 +350,7 @@ function fill_candidates() {
     clear_grid();
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
-            let tile = get_tile(give_id(x, y));
+            let tile = get_tile(get_id(x, y));
             update_tile(tile, "123456789");
             tile.classList.add("candidates");
         }
@@ -359,21 +359,21 @@ function fill_candidates() {
 }
 
 function get_row_id(id) {
-    let [x, y] = give_xy(id)
+    let [x, y] = get_xy(id)
     let ids = []
 
     for (let i = 0; i < 9; i++) {
-        ids.push(give_id(i, y))
+        ids.push(get_id(i, y))
     }
     return ids
 }
 
 function get_col_id(id) {
-    let [x, y] = give_xy(id)
+    let [x, y] = get_xy(id)
     let ids = []
 
     for (let i = 0; i < 9; i++) {
-        ids.push(give_id(x, i))
+        ids.push(get_id(x, i))
     }
     return ids
 }
@@ -405,7 +405,7 @@ async function solve(x = 0, y = 0) { // start from 0 0
     }
 
     // get info on current tile
-    let id = give_id(x, y)
+    let id = get_id(x, y)
     let current_tile = get_tile(id)
     let is_full = read_tile(current_tile) !== ""
 
@@ -453,7 +453,7 @@ function check_valid_placement(id, n) {
 function check_filled() {
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
-            let id = give_id(x, y)
+            let id = get_id(x, y)
             let tile = get_tile(id)
             if (read_tile(tile) == "") {
                 return false
@@ -465,11 +465,11 @@ function check_filled() {
 
 // get values in the same row
 function get_row_num(id) {
-    let [x, y] = give_xy(id)
+    let [x, y] = get_xy(id)
     let row = []
 
     for (let i = 0; i < 9; i++) {
-        let current_id = give_id(i, y)
+        let current_id = get_id(i, y)
         let num = read_tile(get_tile(current_id))
         if (num) { row.push(num) }
     } return row
@@ -477,11 +477,11 @@ function get_row_num(id) {
 
 // get values in the same column
 function get_col_num(id) {
-    let [x, y] = give_xy(id)
+    let [x, y] = get_xy(id)
     let col = []
 
     for (let i = 0; i < 9; i++) {
-        let current_id = give_id(x, i)
+        let current_id = get_id(x, i)
         let num = read_tile(get_tile(current_id))
         if (num) { col.push(num) }
     } return col
@@ -504,7 +504,7 @@ function get_box_num(id) {
 
 // get the box number of tile
 function get_n_box(id) {
-    let [x, y] = give_xy(id)
+    let [x, y] = get_xy(id)
     let block = 1
 
     if (3 <= y && y < 6) {
@@ -530,7 +530,7 @@ async function set_grid(file) {
 
         for (let x = 0; x < 9; x++) {
             // append the value to the right box
-            let tile = get_tile(give_id(x, y));
+            let tile = get_tile(get_id(x, y));
             if (current_row[x] != 0) {
                 tile.classList.add("hint")
                 update_tile(tile, current_row[x])
@@ -574,12 +574,12 @@ function get_tile(id) {
 }
 
 // returns id in string form for HTML DOM
-function give_id(x, y) {
+function get_id(x, y) {
     return x.toString() + '-' + y.toString()
 }
 
 // returns seperate x and y from id
-function give_xy(id) { // usage: let [x, y] = give_xy(id)
+function get_xy(id) { // usage: let [x, y] = get_xy(id)
     let sep = id.split("-")
     return [sep[0], sep[1]]
 }
@@ -592,7 +592,7 @@ function delay(time = timer) {
 function clear_grid() {
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
-            let id = give_id(x, y)
+            let id = get_id(x, y)
             let tile = document.getElementById(id)
             update_tile(tile, "")
             tile.classList.remove("hint", "candidates", "invalid", "removed")
