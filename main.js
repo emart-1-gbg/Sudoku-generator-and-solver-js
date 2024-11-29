@@ -415,7 +415,6 @@ async function solve(x = 0, y = 0) { // start from 0 0
 
     if (timer != 0) { await delay() }
 
-
     // Elimination loop
     for (let n = 1; n < 10; n++) { // try 1-9
         let val = n.toString()
@@ -424,7 +423,6 @@ async function solve(x = 0, y = 0) { // start from 0 0
             await update_tile(current_tile, val) // try placing n
             console.log(`Updating ${id} to ${val}`);
             // (or place a valid number)
-
 
             if (await solve(x + 1, y)) {
                 return true
