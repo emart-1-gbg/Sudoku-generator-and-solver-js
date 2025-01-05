@@ -47,6 +47,7 @@ window.onload = async function () {
 
 
 async function finalise_puzzle() {
+    
     let stay_list = [] // will be final puzzle
     // all of the ids are in the list initially
     for (let i = 0; i < 4; i++) {
@@ -422,19 +423,18 @@ async function solve(x = 0, y = 0) { // start from 0 0
         if (check_valid_placement(id, val)) { // if n doesnt exist in region
             await update_tile(current_tile, val) // try placing n
             console.log(`Updating ${id} to ${val}`);
-            // (or place a valid number)
 
             if (await solve(x + 1, y)) {
                 return true
             }
 
             if (timer != 0) { await delay(timer / 2) }
-        }
-        // if path is not valid, undo until 
-        await update_tile(current_tile, "")
-        console.log("backtrack");
+        } 
     }
 
+    // if path is not valid, undo until 
+    await update_tile(current_tile, "")
+    console.log("backtrack");
     return false
 }
 
