@@ -227,7 +227,7 @@ async function generate() {
 
     let candidates = await read_tile(get_tile(current_id))
 
-    let previous_state = save_region_state(current_id); // Save the current state
+    let previous_state = save_region_state(current_id) // Save the current state
 
     for (let i = 0; i < candidates.length; i++) {
         let candidate = candidates[i]
@@ -337,14 +337,11 @@ function get_region_ids(id) {
 
 function remove_candidate(id, n) {
     let tile = get_tile(id);
-    if (!tile.classList.contains("set")) {
-        let nums = read_tile(tile);
-        let new_nums = nums.replace(n.toString(), "");
-        update_tile(get_tile(id), new_nums);
+    
+    let nums = read_tile(tile);
+    let new_nums = nums.replace(n.toString(), "");
+    update_tile(get_tile(id), new_nums);
 
-        return true;
-    }
-    return false;
 }
 
 function fill_candidates() {
