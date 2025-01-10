@@ -63,12 +63,12 @@ async function finalise_puzzle() {
         stay_list.push(id_p)
     }
 
-    await remove_ids(stay_list)
+    await remove(stay_list)
 
 }
 
 
-async function remove_ids(list) {
+async function remove(list) {
     update_tile(get_tile("4-4"), "")
     get_tile("4-4").classList.add("removed")
 
