@@ -48,23 +48,21 @@ window.onload = async function () {
 
 async function finalise_puzzle() {
     
-    let stay_list = [] // will be final puzzle
-    // all of the ids are in the list initially
-    for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 9; j++) {
+    let list = [] 
+    for (let y = 0; y < 4; y++) {
+        for (let x = 0; x < 9; x++) {
 
-            let id_p = get_id(j, i)
-            stay_list.push(id_p)
+            let id_p = get_id(x, y)
+            list.push(id_p)
         }
     }
 
     for (let k = 0; k < 4; k++) {
         let id_p = get_id(k, 4)
-        stay_list.push(id_p)
+        list.push(id_p)
     }
 
-    await remove(stay_list)
-
+    await remove(list)
 }
 
 
@@ -89,7 +87,6 @@ async function remove(list) {
 
         console.log(`picked ${id}, ${inv_id}`);
 
-
         update_tile(tile, "")
         update_tile(inv_tile, "")
 
@@ -98,12 +95,12 @@ async function remove(list) {
 
         await delay()
 
-        let res = "removed"
+        let status = "removed"
         solutions = 0
         if (!await has_1_solution()) {
             console.log("Multiple solutions, invalid");
 
-            res = "invalid"
+            status = "invalid"
 
             update_tile(tile, val)
             update_tile(inv_tile, inv_val)
@@ -113,14 +110,13 @@ async function remove(list) {
 
         list.splice(rand_i, 1)
 
-        tile.classList.replace("processing", res)
-        inv_tile.classList.replace("processing", res)
+        tile.classList.replace("processing", status)
+        inv_tile.classList.replace("processing", status)
 
         j++
-    }
+    }    
 
     console.log("\nCreated puzzle");
-
 }
 
 function get_inv_id(id) {
@@ -131,10 +127,10 @@ function get_inv_id(id) {
     return get_id(inv_x, inv_y)
 }
 
-async function has_1_solution(x = 0, y = 0, count = 0) { // start from 0 0       
+async function has_1_solution(x = 0, y = 0) { // start from 0 0       
     
     if (x == 9) {
-        return await has_1_solution(0, y + 1, count + 1)
+        return await has_1_solution(0, y + 1)
     }
 
     if (y == 9) {
@@ -154,8 +150,10 @@ async function has_1_solution(x = 0, y = 0, count = 0) { // start from 0 0
     let is_full = read_tile(current_tile) !== ""
 
     if (is_full) { // go to next of its full
-        return await has_1_solution(x + 1, y, count + 1) // try palcing the next number
+        return await has_1_solution(x + 1, y) // try palcing the next number
     }
+
+    await delay()
 
     for (let n = 1; n < 10; n++) { // try 1-9
         let val = n.toString()
@@ -164,11 +162,11 @@ async function has_1_solution(x = 0, y = 0, count = 0) { // start from 0 0
             await update_tile(current_tile, val) // try placing n
             // (or place a valid number)
 
-            await has_1_solution(x + 1, y, count + 1)
+            await has_1_solution(x + 1, y)
 
-            // if path is not valid, undo until 
-            await update_tile(current_tile, "")
         }
+        // if path is not valid, undo until 
+        await update_tile(current_tile, "")
     }
     return solutions === 1
 }
@@ -395,12 +393,11 @@ async function solve(x = 0, y = 0) { // start from 0 0
         return await solve(0, y + 1)
     }
 
-    if (y == 9) {
-        if (check_filled()) {
-            console.log("Puzzle complete");
-            return true
-        }
+    if (check_filled()) {
+        console.log("Puzzle complete");
+        return true
     }
+    
 
     // get info on current tile
     let id = get_id(x, y)
